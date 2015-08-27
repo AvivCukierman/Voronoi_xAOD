@@ -46,8 +46,7 @@ public:
               m_jets          = "AntiKt4LCTopoJets";
 
    // methods used in the analysis
-  virtual EL::StatusCode MakeJetsWArea(const fastjet::JetAlgorithm, const double,const std::vector<fastjet::PseudoJet>&, std::vector<fastjet::PseudoJet>&,bool doareasub=true);
-  virtual void print(fastjet::PseudoJet);
+  virtual EL::StatusCode setClusterP4(xAOD::CaloCluster*, const xAOD::JetFourMom_t&);
 
   // variables that don't get filled at submission time should be
   // protected from being send from the submission node to the worker
@@ -56,9 +55,6 @@ private:
   xAOD::TEvent *m_event; //!
   xAOD::TStore *m_store;  //!
   //Cluster collections:
-  std::vector<fastjet::PseudoJet> clusters;//!
-  std::vector<fastjet::PseudoJet> clusters_voronoi;//!
-  std::vector<fastjet::PseudoJet> jets_voronoi;//!
 public:
   // this is a standard constructor
   VoronoiJets ();
