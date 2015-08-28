@@ -32,8 +32,8 @@
 
 #include <TTree.h>
 
-//#include "MyAnalysis/Candidate.h"
-//#include "MyAnalysis/constituentTests.h"
+//Reclustering
+#include <xAODJetReclustering/JetReclusteringTool.h>
 
 class VoronoiJets : public EL::Algorithm
 {
@@ -54,6 +54,7 @@ public:
 private:
   xAOD::TEvent *m_event; //!
   xAOD::TStore *m_store;  //!
+  JetReclusteringTool *m_jetReclusteringTool; //!
   //Cluster collections:
 public:
   // this is a standard constructor

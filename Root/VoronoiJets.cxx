@@ -35,12 +35,17 @@
 #include "xAODAnaHelpers/HelperFunctions.h"
 #include "xAODAnaHelpers/tools/ReturnCheck.h"
 
+//Reclustering
+#include <xAODJetReclustering/JetReclusteringTool.h>
+
 namespace HF = HelperFunctions;
 
 // this is needed to distribute the algorithm to the workers
 ClassImp(VoronoiJets)
 
-VoronoiJets :: VoronoiJets () {}
+VoronoiJets :: VoronoiJets () :
+m_jetReclusteringTool{nullptr}
+{}
 
 EL::StatusCode VoronoiJets :: setupJob (EL::Job& job)
 {
@@ -65,6 +70,16 @@ EL::StatusCode VoronoiJets :: initialize ()
   m_store = wk()->xaodStore();
   // as a check, let's see the number of events in our xAOD
   Info("initialize()", "Number of events = %lli", m_event->getEntries() ); // print long long int
+
+  m_jetReclusteringTool = new JetReclusteringTool("JetReclusteringTool");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("InputJetContainer",  "VoronoiClustersCDV"),"Problem with jetReclusteringTool initialization");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("OutputJetContainer", "voronoi_jets"),"Problem with jetReclusteringTool initialization");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("ReclusterRadius",    0.4),"Problem with jetReclusteringTool initialization");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("ReclusterAlgorithm", fastjet::antikt_algorithm),"Problem with jetReclusteringTool initialization");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("InputJetPtMin",      0),"Problem with jetReclusteringTool initialization");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("RCJetPtMin",         0),"Problem with jetReclusteringTool initialization");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("RCJetPtFrac",        0),"Problem with jetReclusteringTool initialization");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->initialize(),"Problem with jetReclusteringTool initialization");
 
   return EL::StatusCode::SUCCESS;
 }
@@ -100,6 +115,17 @@ EL::StatusCode VoronoiJets :: execute ()
 
   const xAOD::CaloClusterContainer* voronoi_clusters(nullptr);
   m_store->retrieve(voronoi_clusters, "VoronoiClustersCDV");
+  /*for(auto clust: *voronoi_clusters){
+    std::cout << "Pt: " << clust->pt() << "; Eta: " << clust->eta() << "; Phi: " << clust->phi() << std::endl;
+  }*/ //works
+
+  m_jetReclusteringTool->execute();
+
+  const xAOD::JetContainer*                     out_jets       (nullptr);
+  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "voronoi_jets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+  /*for(auto jet: *out_jets){
+    std::cout << "Pt: " << jet->pt() << "; Eta: " << jet->eta() << "; Phi: " << jet->phi() << std::endl;
+  }*/
 
   return EL::StatusCode::SUCCESS;
 }
@@ -108,6 +134,7 @@ EL::StatusCode VoronoiJets :: postExecute () {return EL::StatusCode::SUCCESS;}
 
 EL::StatusCode VoronoiJets :: finalize ()
 {
+  if(m_jetReclusteringTool) delete m_jetReclusteringTool;
   return EL::StatusCode::SUCCESS;
 }
 
