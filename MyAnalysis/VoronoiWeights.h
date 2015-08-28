@@ -47,7 +47,7 @@ public:
 
    // methods used in the analysis
    struct PJcomp;
-   virtual EL::StatusCode MakeVoronoiClusters(std::map<fastjet::PseudoJet,float,PJcomp>&);
+   virtual EL::StatusCode MakeVoronoiClusters(std::vector< std::pair<fastjet::PseudoJet,float> >&);
 
 private:
   xAOD::TEvent *m_event; //!

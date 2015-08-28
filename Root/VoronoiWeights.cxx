@@ -79,16 +79,12 @@ double mod2pi(double phi){
 //Have to define custom comparator for PseudoJets in order to have a map from PJs to anything
 //Comparison is fuzzy to account for rounding errors
 struct VoronoiWeights :: PJcomp {
-  bool operator() (const fastjet::PseudoJet& lhs, const fastjet::PseudoJet& rhs) const
+  bool operator() (const std::pair<fastjet::PseudoJet, float>& lhsp, const std::pair<fastjet::PseudoJet, float>& rhsp)
   {
-    if(lhs.pt()<rhs.pt()-1) return true;
-    if(lhs.pt()>rhs.pt()+1) return false;
-    if(lhs.eta()<rhs.eta()-.01) return true;
-    if(lhs.eta()>rhs.eta()+.01) return false;
-    if(mod2pi(lhs.phi())<mod2pi(rhs.phi())-.01) return true; 
-    return false;
+    fastjet::PseudoJet lhs = lhsp.first;
+    fastjet::PseudoJet rhs = rhsp.first;
+    return lhs.pt()>rhs.pt();
     //The comparator must be a strict weak ordering. 
-    //Might be an issue if there are two clusters right next to each other with the exact same Pt - highly unlikely
   }
 };
 
@@ -110,46 +106,43 @@ EL::StatusCode VoronoiWeights :: execute ()
   clusters.clear();
   for(const auto clust: *in_clusters){
     fastjet::PseudoJet test = fastjet::PseudoJet(clust->p4()); //read in clusters as PseudoJets
-    if(test.E() >= 0) clusters.push_back(test);
+    if(clust->e() >= 0) clusters.push_back(test);
   }
-  std::map<fastjet::PseudoJet,float,PJcomp> ptmap; //Map from PseudoJets to their corrected (Voronoi subtractd) Pts
-  if(MakeVoronoiClusters(ptmap) != EL::StatusCode::SUCCESS) Error(APP_NAME,"Error in MakeVoronoiClusters");
 
-  /*std::cout << "Size after: " << ptmap.size() << std::endl;
-  for (std::map<fastjet::PseudoJet,float,PJcomp>::iterator it=ptmap.begin(); it!=ptmap.end(); ++it){
-      fastjet::PseudoJet cons = it->first;
-//Eta: -1.59458; Phi: 2.9978
-      if(fabs(cons.eta()+1.59458)<0.1 && fabs(cons.phi()-2.9978)<0.1){
-        std::cout << "Pt: " << cons.pt() << "; Eta: " << cons.eta() <<"; Phi: " << cons.phi() << std::endl;
-        std::cout << ptmap.count(cons) << "; " << ptmap[cons] << std::endl;
-      }
-  }*/
+  std::vector< std::pair< fastjet::PseudoJet,float > > ptvec; //vector of pairs of PJs and their corrected pTs
+  if(MakeVoronoiClusters(ptvec) != EL::StatusCode::SUCCESS) Error(APP_NAME,"Error in MakeVoronoiClusters");
+  std::sort(ptvec.begin(), ptvec.end(), PJcomp());
+
+  int i=0;
   static SG::AuxElement::Decorator< float > correctedPt("correctedPt");
-  for(const auto clust: *in_clusters){
+  for(const auto clust: HF::sort_container_pt(in_clusters)){
     correctedPt(*clust) = 0;
-    fastjet::PseudoJet pjclust = fastjet::PseudoJet(clust->p4());
-    //std::cout << ptmap.count(pjclust) << std::endl;
-    float subpt=0;
-    if(ptmap.count(pjclust)==0){ //Should mean E<0. Occasionally means the comparator fucked up (about one cluster every hundred events).
-      if(pjclust.E()<0) continue; //If E<0, correctedPt = 0 - don't use that cluster.
-      else{ 
-        //Problem with the comparator. We have to go back through the map and search manually for the cluster. This means that for the vast majority of clusters the setting of the corrected Pt is O(logn) but for a few rare ones it's O(n).
-        //std::cout << "Pt: " << pjclust.pt() << "; Eta: " << pjclust.eta() <<"; Phi: " << pjclust.phi() << std::endl;
-        bool found = 0; 
-        for (std::map<fastjet::PseudoJet,float,PJcomp>::iterator it=ptmap.begin(); it!=ptmap.end(); ++it){
-          fastjet::PseudoJet cons = it->first;
-          if(fabs(cons.eta()-pjclust.eta())<0.01 && fabs(mod2pi(cons.phi())-mod2pi(pjclust.phi()))<0.01 && fabs(cons.pt()-pjclust.pt())<1){ //Literally exactly the same comparator. Only the C++ gods know why it didn't work the first time.
-            found = 1;
-            subpt = it->second;
-            break;
-          }
-        }
-        if(!found) Error(APP_NAME,"Cluster with E>0 with no Voronoi area");
-      }
+    if(m_debug){
+      std::cout << "CDV Pt: " << clust->pt() << "; E: " << clust->e()<< std::endl;
+      std::cout << "PT Vec Pt: " << ptvec[i].first.pt() << "; E: " << ptvec[i].first.e()<< std::endl;
     }
-    else subpt = ptmap[pjclust];
-    if(subpt < 0) continue;
-    correctedPt(*clust) = subpt;
+
+    //There should be the same number of positive E Clusters in the CDV as clusters in the ptvec
+    bool endCDV = clust->e()<=0;
+    bool endvec = i==ptvec.size();
+    if(endCDV && endvec) continue;
+    else if(endCDV || endvec){
+      Error(APP_NAME,"Clusters don't have same number of elements.");
+      return EL::StatusCode::FAILURE;
+    }
+    else{
+      correctedPt(*clust) = ptvec[i].second;
+      i++;
+    }
+
+    //And the clusters should match
+    float CDVpt = clust->pt();
+    float PJpt = ptvec[i-1].first.pt();
+    if (fabs(CDVpt-PJpt) > 0.1){
+      if(m_debug) std::cout << fabs(CDVpt-PJpt) << std::endl;
+      Error(APP_NAME,"Clusters don't match.");
+      return EL::StatusCode::FAILURE;
+    }
   }
 
   return EL::StatusCode::SUCCESS;
@@ -166,7 +159,7 @@ EL::StatusCode VoronoiWeights :: histFinalize () {
   return EL::StatusCode::SUCCESS;
 }
 
-EL::StatusCode VoronoiWeights::MakeVoronoiClusters(std::map<fastjet::PseudoJet,float,PJcomp>& correctedptmap){
+EL::StatusCode VoronoiWeights::MakeVoronoiClusters(std::vector< std::pair< fastjet::PseudoJet,float > >& correctedptvec){
   std::vector<fastjet::PseudoJet> inputConst = clusters;
   fastjet::Selector jselector = fastjet::SelectorAbsRapRange(0.0,2.1);
   fastjet::JetAlgorithm algo = fastjet::kt_algorithm;
@@ -195,7 +188,9 @@ EL::StatusCode VoronoiWeights::MakeVoronoiClusters(std::map<fastjet::PseudoJet,f
       /*if(correctedPt<0.) continue;
       constituentP.reset_PtYPhiM(correctedPt, constituents[iCons].rap(), constituents[iCons].phi(), constituents[iCons].m());
       clusters_voronoi.push_back(constituentP);*/
-      correctedptmap[cons] = correctedPt;
+      //correctedptmap[cons] = correctedPt;
+      std::pair <fastjet::PseudoJet,float> pjcptpair (cons,correctedPt);
+      correctedptvec.push_back(pjcptpair);
     } // end loop over cons
   } // end loop over jets
   //std::cout << "Size: " << correctedptmap.size() << std::endl;
