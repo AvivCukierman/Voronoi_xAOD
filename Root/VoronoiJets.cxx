@@ -101,10 +101,8 @@ EL::StatusCode VoronoiJets :: execute ()
   ConstDataVector<ccc>* subset = new ConstDataVector<ccc>(SG::VIEW_ELEMENTS);
   std::pair< ccc*, xAOD::ShallowAuxContainer* > clustersSC = xAOD::shallowCopyContainer( *in_clusters );
   for(auto cluster: *(clustersSC.first)){
-    //float correctedPt(cluster->auxdecor<float>("correctedPt"));
     float correctedPt_f = correctedPt(*cluster);
     if(correctedPt_f <= 0) continue;
-    //cluster->setJetP4(xAOD::JetFourMom_t(correctedPt, cluster->eta(), cluster->phi(), cluster->m()));
     if(setClusterP4(cluster,xAOD::JetFourMom_t(correctedPt_f, cluster->eta(), cluster->phi(), cluster->m())) != EL::StatusCode::SUCCESS);
     subset->push_back(cluster);
   }
@@ -113,19 +111,13 @@ EL::StatusCode VoronoiJets :: execute ()
   m_store->record(clustersSC.second, "CorrectedCaloClustersAux.");
   m_store->record(subset, "VoronoiClustersCDV");
 
-  const xAOD::CaloClusterContainer* voronoi_clusters(nullptr);
-  m_store->retrieve(voronoi_clusters, "VoronoiClustersCDV");
-  /*for(auto clust: *voronoi_clusters){
-    std::cout << "Pt: " << clust->pt() << "; Eta: " << clust->eta() << "; Phi: " << clust->phi() << std::endl;
-  }*/ //works
+/*  const xAOD::CaloClusterContainer* voronoi_clusters(nullptr);
+  m_store->retrieve(voronoi_clusters, "VoronoiClustersCDV");*/
 
   m_jetReclusteringTool->execute();
 
-  const xAOD::JetContainer*                     out_jets       (nullptr);
-  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "voronoi_jets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
-  /*for(auto jet: *out_jets){
-    std::cout << "Pt: " << jet->pt() << "; Eta: " << jet->eta() << "; Phi: " << jet->phi() << std::endl;
-  }*/
+/*  const xAOD::JetContainer*                     out_jets       (nullptr);
+  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "voronoi_jets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");*/
 
   return EL::StatusCode::SUCCESS;
 }
