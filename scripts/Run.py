@@ -83,11 +83,13 @@ job.algsAdd(ntuple)
 logging.info("creating algorithms")
 alg1 = ROOT.VoronoiWeights()
 alg2 = ROOT.VoronoiJets()
+alg3 = ROOT.JetMatching()
 
 logging.info("adding algorithms")
 job.algsAdd(alg1)
 job.algsAdd(alg2)
-alg2.outputName = "myOutput"
+job.algsAdd(alg3)
+alg3.outputName = "myOutput"
 
 # make the driver we want to use:
 # this one works by running the algorithm directly
