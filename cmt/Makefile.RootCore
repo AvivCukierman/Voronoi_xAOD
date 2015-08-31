@@ -13,7 +13,7 @@ PACKAGE              = MyAnalysis
 PACKAGE_PRELOAD      = fastjet fastjettools fastjetplugins
 
 # additional compilation flags to pass (not propagated to dependent packages):
-PACKAGE_CXXFLAGS     = 
+PACKAGE_CXXFLAGS     = -Wno-sign-compare
 
 # additional compilation flags to pass (propagated to dependent packages):
 PACKAGE_OBJFLAGS     = 
