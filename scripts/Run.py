@@ -74,22 +74,23 @@ if options.skip_events:
     job.options().setDouble(ROOT.EL.Job.optSkipEvents, options.skip_events)
 
 #define an output and an ntuple associated to that output
-output = ROOT.EL.OutputStream("myOutput");
+'''output = ROOT.EL.OutputStream("myOutput");
 job.outputAdd(output)
 ntuple = ROOT.EL.NTupleSvc("myOutput");
-job.algsAdd(ntuple)
+job.algsAdd(ntuple)'''
 
 # add our algorithm to the job
 logging.info("creating algorithms")
 alg1 = ROOT.VoronoiWeights()
 alg2 = ROOT.VoronoiJets()
 alg3 = ROOT.JetMatching()
+alg4 = ROOT.WriteTree()
 
 logging.info("adding algorithms")
 job.algsAdd(alg1)
 job.algsAdd(alg2)
 job.algsAdd(alg3)
-alg3.outputName = "myOutput"
+job.algsAdd(alg4)
 
 # make the driver we want to use:
 # this one works by running the algorithm directly
