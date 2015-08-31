@@ -73,11 +73,11 @@ EL::StatusCode VoronoiJets :: initialize ()
 
   m_jetReclusteringTool = new JetReclusteringTool("JetReclusteringTool");
   RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("InputJetContainer",  "VoronoiClustersCDV"),"Problem with jetReclusteringTool initialization");
-  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("OutputJetContainer", "voronoi_jets"),"Problem with jetReclusteringTool initialization");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("OutputJetContainer", "AntiKt4VoronoiJets"),"Problem with jetReclusteringTool initialization");
   RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("ReclusterRadius",    0.4),"Problem with jetReclusteringTool initialization");
   RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("ReclusterAlgorithm", fastjet::antikt_algorithm),"Problem with jetReclusteringTool initialization");
   RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("InputJetPtMin",      0),"Problem with jetReclusteringTool initialization");
-  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("RCJetPtMin",         0),"Problem with jetReclusteringTool initialization");
+  RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("RCJetPtMin",         5),"Problem with jetReclusteringTool initialization");
   RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->setProperty("RCJetPtFrac",        0),"Problem with jetReclusteringTool initialization");
   RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTool->initialize(),"Problem with jetReclusteringTool initialization");
 
