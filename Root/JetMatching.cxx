@@ -57,7 +57,7 @@ EL::StatusCode JetMatching :: histInitialize () {
 
 EL::StatusCode JetMatching :: fileExecute () {return EL::StatusCode::SUCCESS;}
 
-EL::StatusCode JetMatching :: changeInput (bool firstFile) {return EL::StatusCode::SUCCESS;}
+EL::StatusCode JetMatching :: changeInput (bool /*firstFile*/) {return EL::StatusCode::SUCCESS;}
 
 EL::StatusCode JetMatching :: initialize ()
 {
@@ -80,13 +80,15 @@ EL::StatusCode JetMatching :: execute ()
 
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
-  if(!m_clust.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug), "Could not get the clusters container.");
   if(!m_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug), "Could not get the jets container.");
   if(!m_truth_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug), "Could not get the truth jets container.");
   if(!m_voronoi_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi_jets,    m_voronoi_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
 
   FindTruthMatch(HF::sort_container_pt(voronoi_jets), HF::sort_container_pt(truth_jets));
 
+  SetMinDR(HF::sort_container_pt(truth_jets));
+
+  //To check truth matches:
   //DataVector<xAOD::Jet_v1> sorted_truth_jets = HF::sort_container_pt(truth_jets);
   /*static SG::AuxElement::ConstAccessor< int > truth_match_i("truth_match_i");
   std::cout << "Voronoi" << std::endl;
@@ -95,6 +97,12 @@ EL::StatusCode JetMatching :: execute ()
     int truthmatch = truth_match_i(*jet);
     std::cout << truthmatch  << std::endl;
     std::cout << sorted_truth_jets.at(truthmatch)->pt() << std::endl;
+  }*/
+
+  //To check minDR:
+  /*static SG::AuxElement::ConstAccessor< float > minDR("minDR");
+  for(auto jet: *truth_jets){
+    std::cout << minDR(*jet) << std::endl;
   }*/
   return EL::StatusCode::SUCCESS;
 }
@@ -144,6 +152,31 @@ EL::StatusCode JetMatching :: FindTruthMatch(DataVector<xAOD::Jet_v1> jets, Data
         jet(maxPtIndex, TruthJetType).Add(JetType+"_match", thejet, true);*/ //add link from truth jet to jet as well eventually
     }
     truth_match_i(*jet) = maxPtIndex; //if no match truth_match_i == -1
+  }//jet loop
+  return EL::StatusCode::SUCCESS;
+}
+
+EL::StatusCode JetMatching :: SetMinDR(DataVector<xAOD::Jet_v1> jets){
+  static SG::AuxElement::Decorator< float > minDR("minDR");
+  for(int iJ=0; iJ<jets.size(); iJ++) {
+    DataVector<xAOD::Jet_v1>::ElementProxy jet1 = jets.at(iJ);
+    float mindR= 999.99;
+    for(int jJ=0; jJ<jets.size(); jJ++){
+      if(iJ==jJ) continue;
+      DataVector<xAOD::Jet_v1>::ElementProxy jet2 = jets.at(jJ);
+      if(jet2->pt() < 5000) continue;
+
+      float dR = deltaR(jet1,jet2);
+
+      if(dR<mindR){ mindR = dR;}
+    } //inner jet loop
+
+    if(mindR < 999.99){
+      minDR(*jet1) = mindR; 
+    }
+    else{
+      return EL::StatusCode::FAILURE;
+    }
   }//jet loop
   return EL::StatusCode::SUCCESS;
 }

@@ -46,6 +46,7 @@ public:
 
    // methods used in the analysis
   EL::StatusCode FindTruthMatch(DataVector<xAOD::Jet_v1>, DataVector<xAOD::Jet_v1>);
+  EL::StatusCode SetMinDR(DataVector<xAOD::Jet_v1>);
 
   // variables that don't get filled at submission time should be
   // protected from being send from the submission node to the worker
