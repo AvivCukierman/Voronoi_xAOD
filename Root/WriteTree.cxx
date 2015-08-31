@@ -107,7 +107,7 @@ EL::StatusCode WriteTree :: initialize ()
   m_tree->Branch("tjvoro0pt","std::vector<float>", &m_tjvoro0pt);
   m_tree->Branch("tjvoro0eta","std::vector<float>", &m_tjvoro0eta);
   m_tree->Branch("tjvoro0phi","std::vector<float>", &m_tjvoro0phi);
-  m_tree->Branch("tjvoro0mass","std::vector<float>", &m_tjvoro0mass);
+  m_tree->Branch("tjvoro0m","std::vector<float>", &m_tjvoro0mass);
   m_tree->Branch("tjvoro0width","std::vector<float>", &m_tjvoro0width);
   m_tree->Branch("tjvoro0mindr","std::vector<float>", &m_tjvoro0mindr);
 
@@ -119,20 +119,27 @@ EL::StatusCode WriteTree :: execute ()
   const char* APP_NAME = "WriteTree::execute()";
   const xAOD::EventInfo*                        eventInfo     (nullptr);
   const xAOD::JetContainer*                     in_jets       (nullptr);
-  const xAOD::JetContainer*                     truth_jets       (nullptr);
-  const xAOD::JetContainer*                     voronoi_jets       (nullptr);
+  const xAOD::JetContainer*                     truth_jets    (nullptr);
+  const xAOD::JetContainer*                     voronoi_jets  (nullptr);
+  const xAOD::VertexContainer*                  vertices      (nullptr);
 
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
   if(!m_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug), "Could not get the jets container.");
   if(!m_truth_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug), "Could not get the truth jets container.");
   if(!m_voronoi_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi_jets,    m_voronoi_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+  if(!m_vertices.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(vertices,    m_vertices,       m_event, m_store, m_debug), "Could not get the vertices container.");
 
   m_eventNumber = eventInfo->eventNumber();
 
   if(FillJetVars(voronoi_jets,truth_jets,m_jvoro0pt,m_jvoro0eta,m_jvoro0phi,m_jvoro0mass,m_jvoro0width,m_jvoro0mindr,m_tjvoro0pt,m_tjvoro0eta,m_tjvoro0phi,m_tjvoro0mass,m_tjvoro0width,m_tjvoro0mindr) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FillJetVars");
 
+  m_mu = eventInfo->averageInteractionsPerCrossing();
+  m_NPV = 0;
+  for ( auto *ivert : *vertices ){
+    if ( (ivert)->nTrackParticles() >= 2 ) ++m_NPV;
+  }
   // fill in all variables
   m_tree->Fill();
 
