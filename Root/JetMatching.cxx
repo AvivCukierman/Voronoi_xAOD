@@ -73,7 +73,6 @@ EL::StatusCode JetMatching :: execute ()
 {
   const char* APP_NAME = "JetMatching::execute()";
   const xAOD::EventInfo*                        eventInfo     (nullptr);
-  const xAOD::CaloClusterContainer*             in_clusters   (nullptr);
   const xAOD::JetContainer*                     in_jets       (nullptr);
   const xAOD::JetContainer*                     truth_jets       (nullptr);
   const xAOD::JetContainer*                     voronoi_jets       (nullptr);
@@ -84,9 +83,11 @@ EL::StatusCode JetMatching :: execute ()
   if(!m_truth_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug), "Could not get the truth jets container.");
   if(!m_voronoi_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi_jets,    m_voronoi_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
 
-  FindTruthMatch(HF::sort_container_pt(voronoi_jets), HF::sort_container_pt(truth_jets));
+  if(FindTruthMatch(HF::sort_container_pt(voronoi_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in FindTruthMatch");
 
-  SetMinDR(HF::sort_container_pt(truth_jets));
+  if(SetMinDR(HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in SetMinDR (only one jet in event?)");
 
   //To check truth matches:
   //DataVector<xAOD::Jet_v1> sorted_truth_jets = HF::sort_container_pt(truth_jets);

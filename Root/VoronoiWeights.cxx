@@ -57,7 +57,7 @@ EL::StatusCode VoronoiWeights :: histInitialize () {
 
 EL::StatusCode VoronoiWeights :: fileExecute () {return EL::StatusCode::SUCCESS;}
 
-EL::StatusCode VoronoiWeights :: changeInput (bool firstFile) {return EL::StatusCode::SUCCESS;}
+EL::StatusCode VoronoiWeights :: changeInput (bool /*firstFile*/) {return EL::StatusCode::SUCCESS;}
 
 EL::StatusCode VoronoiWeights :: initialize ()
 {

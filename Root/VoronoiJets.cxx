@@ -62,7 +62,7 @@ EL::StatusCode VoronoiJets :: histInitialize () {
 
 EL::StatusCode VoronoiJets :: fileExecute () {return EL::StatusCode::SUCCESS;}
 
-EL::StatusCode VoronoiJets :: changeInput (bool firstFile) {return EL::StatusCode::SUCCESS;}
+EL::StatusCode VoronoiJets :: changeInput (bool /*firstFile*/) {return EL::StatusCode::SUCCESS;}
 
 EL::StatusCode VoronoiJets :: initialize ()
 {
@@ -103,7 +103,8 @@ EL::StatusCode VoronoiJets :: execute ()
   for(auto cluster: *(clustersSC.first)){
     float correctedPt_f = correctedPt(*cluster);
     if(correctedPt_f <= 0) continue;
-    if(setClusterP4(cluster,xAOD::JetFourMom_t(correctedPt_f, cluster->eta(), cluster->phi(), cluster->m())) != EL::StatusCode::SUCCESS);
+    if(setClusterP4(cluster,xAOD::JetFourMom_t(correctedPt_f, cluster->eta(), cluster->phi(), cluster->m())) != EL::StatusCode::SUCCESS)
+      Error(APP_NAME,"Error in setClusterP4");
     subset->push_back(cluster);
   }
 
@@ -136,7 +137,7 @@ EL::StatusCode VoronoiJets :: histFinalize () {
 
 EL::StatusCode VoronoiJets::setClusterP4(xAOD::CaloCluster* cluster, const xAOD::JetFourMom_t &p4){
   float pt = p4.pt();
-  float e = p4.e();
+  //float e = p4.e();
   float eta = p4.eta();
   float phi = p4.phi();
   cluster->setE(pt*cosh(eta));

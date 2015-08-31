@@ -98,7 +98,7 @@ EL::StatusCode MyxAODAnalysis :: histInitialize () {
 
 EL::StatusCode MyxAODAnalysis :: fileExecute () {return EL::StatusCode::SUCCESS;}
 
-EL::StatusCode MyxAODAnalysis :: changeInput (bool firstFile) {return EL::StatusCode::SUCCESS;}
+EL::StatusCode MyxAODAnalysis :: changeInput (bool /*firstFile*/) {return EL::StatusCode::SUCCESS;}
 
 EL::StatusCode MyxAODAnalysis :: initialize ()
 {
@@ -257,6 +257,7 @@ EL::StatusCode MyxAODAnalysis::MakeJetsWArea(const fastjet::JetAlgorithm algo, c
   std::vector<fastjet::PseudoJet> inclusiveJets = sorted_by_pt(clustSeq.inclusive_jets(5.));
   std::vector<fastjet::PseudoJet> subtractedJets = inclusiveJets;
 
+  //incomplete
   if(doareasub){
     fastjet::Selector jselector = fastjet::SelectorAbsRapRange(0.0,2.1);
     fastjet::JetDefinition jetDefkt(fastjet::kt_algorithm,0.4);
@@ -264,7 +265,7 @@ EL::StatusCode MyxAODAnalysis::MakeJetsWArea(const fastjet::JetAlgorithm algo, c
     fastjet::JetMedianBackgroundEstimator bge(jselector,jetDefkt,voronoi_area);
     fastjet::Subtractor subtractor(&bge);
     bge.set_particles(inputConst);
-    double rho = bge.rho();
+    //double rho = bge.rho();
     subtractedJets = subtractor(inclusiveJets);
   }
 
