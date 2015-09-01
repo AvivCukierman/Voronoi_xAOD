@@ -9,7 +9,7 @@ from optparse import OptionParser
 parser = OptionParser()
 
 # job configuration
-parser.add_option("--submitDir", help="dir to store the output", default="submit_dir")
+parser.add_option("--submitDir", help="dir to store the output", default="submit_dir_z1and2")
 parser.add_option("--inputDS", help="input DS from DQ2", default="none")
 parser.add_option("--driver", help="select where to run", choices=("direct", "prooflite", "grid"), default="direct")
 parser.add_option("--nevents", type=int, help="number of events to process for all the datasets")
@@ -44,7 +44,7 @@ if options.inputDS != "none":
 else :
     #search_directories = ["/afs/cern.ch/work/a/amarzin/susy_13TeV/samples/W/"]
     #search_directories = ["/nfs/slac/g/atlas/u01/users/acukierm/xAOD2/MyPackage/scripts"]
-    search_directories = ["/atlas/local/acukierm/dijet/"]
+    search_directories = ["/atlas/local/acukierm/dijetz1and2/"]
 
     # scan for datasets in the given directories
     for directory in search_directories:
