@@ -59,7 +59,20 @@ WriteTree :: WriteTree () :
   m_tjvoro0phi{ARRAY_INIT},
   m_tjvoro0mass{ARRAY_INIT},
   m_tjvoro0width{ARRAY_INIT},
-  m_tjvoro0mindr{ARRAY_INIT}
+  m_tjvoro0mindr{ARRAY_INIT},
+
+  m_j0pt{ARRAY_INIT},
+  m_j0eta{ARRAY_INIT},
+  m_j0phi{ARRAY_INIT},
+  m_j0mass{ARRAY_INIT},
+  m_j0width{ARRAY_INIT},
+  m_j0mindr{ARRAY_INIT},
+  m_tj0pt{ARRAY_INIT},
+  m_tj0eta{ARRAY_INIT},
+  m_tj0phi{ARRAY_INIT},
+  m_tj0mass{ARRAY_INIT},
+  m_tj0width{ARRAY_INIT},
+  m_tj0mindr{ARRAY_INIT}
 {}
 
 EL::StatusCode WriteTree :: setupJob (EL::Job& job)
@@ -111,6 +124,19 @@ EL::StatusCode WriteTree :: initialize ()
   m_tree->Branch("tjvoro0width","std::vector<float>", &m_tjvoro0width);
   m_tree->Branch("tjvoro0mindr","std::vector<float>", &m_tjvoro0mindr);
 
+  m_tree->Branch("j0pt","std::vector<float>", &m_j0pt);
+  m_tree->Branch("j0eta","std::vector<float>", &m_j0eta);
+  m_tree->Branch("j0phi","std::vector<float>", &m_j0phi);
+  m_tree->Branch("j0mass","std::vector<float>", &m_j0mass);
+  m_tree->Branch("j0width","std::vector<float>", &m_j0width);
+  m_tree->Branch("j0mindr","std::vector<float>", &m_j0mindr);
+  m_tree->Branch("tj0pt","std::vector<float>", &m_tj0pt);
+  m_tree->Branch("tj0eta","std::vector<float>", &m_tj0eta);
+  m_tree->Branch("tj0phi","std::vector<float>", &m_tj0phi);
+  m_tree->Branch("tj0m","std::vector<float>", &m_tj0mass);
+  m_tree->Branch("tj0width","std::vector<float>", &m_tj0width);
+  m_tree->Branch("tj0mindr","std::vector<float>", &m_tj0mindr);
+
   return EL::StatusCode::SUCCESS;
 }
 
@@ -133,6 +159,9 @@ EL::StatusCode WriteTree :: execute ()
   m_eventNumber = eventInfo->eventNumber();
 
   if(FillJetVars(voronoi_jets,truth_jets,m_jvoro0pt,m_jvoro0eta,m_jvoro0phi,m_jvoro0mass,m_jvoro0width,m_jvoro0mindr,m_tjvoro0pt,m_tjvoro0eta,m_tjvoro0phi,m_tjvoro0mass,m_tjvoro0width,m_tjvoro0mindr) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in FillJetVars");
+
+  if(FillJetVars(in_jets,truth_jets,m_j0pt,m_j0eta,m_j0phi,m_j0mass,m_j0width,m_j0mindr,m_tj0pt,m_tj0eta,m_tj0phi,m_tj0mass,m_tj0width,m_tj0mindr) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FillJetVars");
 
   m_mu = eventInfo->averageInteractionsPerCrossing();
@@ -190,20 +219,20 @@ EL::StatusCode WriteTree :: FillJetVars(const DataVector<xAOD::Jet_v1>* jets,
   static SG::AuxElement::ConstAccessor< float > minDR("minDR");
 
   for(const auto jet: *jets){
-    jetpt.push_back(jet->pt());
+    jetpt.push_back(jet->pt()/1000.);
     jeteta.push_back(jet->eta());
     jetphi.push_back(jet->phi());
-    jetmass.push_back(jet->m());
+    jetmass.push_back(jet->m()/1000.);
     jetwidth.push_back(-99);
     jetmindr.push_back(-99);
 
     int truthmatch = truth_match_i(*jet);
     if(truthmatch > -1){
       auto tjet = sorted_truth_jets.at(truthmatch);
-      tjetpt.push_back(tjet->pt());
+      tjetpt.push_back(tjet->pt()/1000.);
       tjeteta.push_back(tjet->eta());
       tjetphi.push_back(tjet->phi());
-      tjetmass.push_back(tjet->m());
+      tjetmass.push_back(tjet->m()/1000.);
       tjetwidth.push_back(-99);
       tjetmindr.push_back(minDR(*tjet));
     }

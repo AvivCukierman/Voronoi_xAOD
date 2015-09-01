@@ -86,6 +86,9 @@ EL::StatusCode JetMatching :: execute ()
   if(FindTruthMatch(HF::sort_container_pt(voronoi_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FindTruthMatch");
 
+  if(FindTruthMatch(HF::sort_container_pt(in_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in FindTruthMatch");
+
   if(SetMinDR(HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in SetMinDR (only one jet in event?)");
 

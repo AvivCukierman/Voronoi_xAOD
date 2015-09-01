@@ -86,6 +86,19 @@ private:
   std::vector<float> m_tjvoro0mass; //!
   std::vector<float> m_tjvoro0width; //!
   std::vector<float> m_tjvoro0mindr; //!
+
+  std::vector<float> m_j0pt; //!
+  std::vector<float> m_j0eta; //!
+  std::vector<float> m_j0phi; //!
+  std::vector<float> m_j0mass; //!
+  std::vector<float> m_j0width; //!
+  std::vector<float> m_j0mindr; //!
+  std::vector<float> m_tj0pt; //!
+  std::vector<float> m_tj0eta; //!
+  std::vector<float> m_tj0phi; //!
+  std::vector<float> m_tj0mass; //!
+  std::vector<float> m_tj0width; //!
+  std::vector<float> m_tj0mindr; //!
 public:
   // this is a standard constructor
   WriteTree ();
