@@ -27,6 +27,7 @@
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthEventContainer.h"
 #include "xAODTruth/TruthEvent.h"
+#include "xAODTruth/TruthVertexContainer.h"
 
 // Infrastructure include(s):
 #include "xAODRootAccess/Init.h"
@@ -147,7 +148,7 @@ EL::StatusCode WriteTree :: execute ()
   const xAOD::JetContainer*                     in_jets       (nullptr);
   const xAOD::JetContainer*                     truth_jets    (nullptr);
   const xAOD::JetContainer*                     voronoi_jets  (nullptr);
-  const xAOD::VertexContainer*                  vertices      (nullptr);
+  const xAOD::TruthVertexContainer*                  vertices      (nullptr);
 
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
@@ -167,7 +168,8 @@ EL::StatusCode WriteTree :: execute ()
   m_mu = eventInfo->averageInteractionsPerCrossing();
   m_NPV = 0;
   for ( auto *ivert : *vertices ){
-    if ( (ivert)->nTrackParticles() >= 2 ) ++m_NPV;
+    //if ( (ivert)->nTrackParticles() >= 2 ) ++m_NPV;
+    ++m_NPV;
   }
   // fill in all variables
   m_tree->Fill();

@@ -42,7 +42,7 @@ public:
               m_jets           = "AntiKt4LCTopoJets",
               m_truth_jets     = "AntiKt4TruthJets",
               m_voronoi_jets   = "AntiKt4VoronoiJets",
-              m_vertices       = "PrimaryVertices";
+              m_vertices       = "TruthVertices";
 
    // methods used in the analysis
   EL::StatusCode FillJetVars(const DataVector<xAOD::Jet_v1>* jets,
