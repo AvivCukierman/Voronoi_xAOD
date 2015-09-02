@@ -21,6 +21,15 @@ parser.add_option("--dataSource", help="undefined=-1, data=0, FullSim=1, AF-II=2
 
 (options, args) = parser.parse_args()
 
+# check submission directory
+if os.path.exists(options.submitDir):
+  if options.overwrite:
+    logging.info("removing {0:s}".format(options.submitDir))
+    import shutil
+    shutil.rmtree(options.submitDir, True)
+  else:
+    raise OSError('Output directory {0:s} already exists. Either re-run with -w (overwrite), choose a different --submitDir, or rm -rf it yourself.'.format(options.submitDir))
+
 import atexit
 @atexit.register
 def quite_exit():
@@ -49,14 +58,6 @@ if options.driver == 'lsf':
 logging.info("creating new sample handler")
 sh_all = ROOT.SH.SampleHandler()
 
-#search_directories = ["/afs/cern.ch/work/a/amarzin/susy_13TeV/samples/W/"]
-#search_directories = ["/nfs/slac/g/atlas/u01/users/acukierm/xAOD2/MyPackage/scripts"]
-'''if use_scanDQ2:
-  search_directories = ["mc15_13TeV.361020.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ0W.merge.AOD.e3569_s2576_s2132_r6765_r6282/"]
-  #search_directories = ["user.amarzin.407012.ttbar.DAOD_SUSY10.e4023_s2608_r6765_r6282_p2375_tag_06_v3_output_xAOD.root/"]
-else:
-  search_directories = ["/atlas/local/acukierm/dijetz1and2/"]
-'''
 # scan for datasets in the given directories
 directory = options.search_directories
 if use_scanDQ2:
