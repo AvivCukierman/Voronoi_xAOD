@@ -26,6 +26,7 @@
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthEventContainer.h"
 #include "xAODTruth/TruthEvent.h"
+#include "xAODCaloEvent/CaloClusterChangeSignalState.h"
 
 // Infrastructure include(s):
 #include "xAODRootAccess/Init.h"
@@ -89,18 +90,20 @@ EL::StatusCode VoronoiJets :: execute ()
   const char* APP_NAME = "VoronoiJets::execute()";
   const xAOD::EventInfo*                        eventInfo     (nullptr);
   const xAOD::CaloClusterContainer*             in_clusters   (nullptr);
-  const xAOD::JetContainer*                     in_jets       (nullptr);
 
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
   if(!m_clust.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug), "Could not get the clusters container.");
-  if(!m_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug), "Could not get the jets container.");
 
   static SG::AuxElement::ConstAccessor< float > correctedPt("correctedPt");
   typedef xAOD::CaloClusterContainer ccc;
   ConstDataVector<ccc>* subset = new ConstDataVector<ccc>(SG::VIEW_ELEMENTS);
   std::pair< ccc*, xAOD::ShallowAuxContainer* > clustersSC = xAOD::shallowCopyContainer( *in_clusters );
+  CaloClusterChangeSignalStateList stateHelperList;
   for(auto cluster: *(clustersSC.first)){
+    if(m_doLC) stateHelperList.add(cluster,xAOD::CaloCluster::State(1));
+    else stateHelperList.add(cluster,xAOD::CaloCluster::State(0));
+
     float correctedPt_f = correctedPt(*cluster);
     if(correctedPt_f <= 0) continue;
     if(setClusterP4(cluster,xAOD::JetFourMom_t(correctedPt_f, cluster->eta(), cluster->phi(), cluster->m())) != EL::StatusCode::SUCCESS)

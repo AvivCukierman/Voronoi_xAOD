@@ -16,6 +16,7 @@ parser.add_option("--driver", help="select where to run", choices=("direct", "pr
 parser.add_option("--nevents", type=int, help="number of events to process for all the datasets")
 parser.add_option("--skip-events", type=int, help="skip the first n events")
 parser.add_option("-w", "--overwrite", action='store_true', default=False, help="overwrite previous submitDir")
+parser.add_option("--doLC", action='store_true',help="Apply LC calibration to clusters",default=False)
 # input configuration
 parser.add_option("--dataSource", help="undefined=-1, data=0, FullSim=1, AF-II=2 ", type="int", default=1)
 
@@ -90,24 +91,24 @@ if options.skip_events:
     logging.info("skipping first %d events", options.skip_events)
     job.options().setDouble(ROOT.EL.Job.optSkipEvents, options.skip_events)
 
-#define an output and an ntuple associated to that output
-'''output = ROOT.EL.OutputStream("myOutput");
-job.outputAdd(output)
-ntuple = ROOT.EL.NTupleSvc("myOutput");
-job.algsAdd(ntuple)'''
 
 # add our algorithm to the job
 logging.info("creating algorithms")
-alg1 = ROOT.VoronoiWeights()
-alg2 = ROOT.VoronoiJets()
-alg3 = ROOT.JetMatching()
-alg4 = ROOT.WriteTree()
+voronoiweights = ROOT.VoronoiWeights()
+voronoijets = ROOT.VoronoiJets()
+jetmatching = ROOT.JetMatching()
+writetree = ROOT.WriteTree()
+
+setattr(voronoiweights, 'm_doLC', options.doLC)
+setattr(voronoijets, 'm_doLC', options.doLC)
+setattr(jetmatching, 'm_doLC', options.doLC)
+setattr(writetree, 'm_doLC', options.doLC)
 
 logging.info("adding algorithms")
-job.algsAdd(alg1)
-job.algsAdd(alg2)
-job.algsAdd(alg3)
-job.algsAdd(alg4)
+job.algsAdd(voronoiweights)
+job.algsAdd(voronoijets)
+job.algsAdd(jetmatching)
+job.algsAdd(writetree)
 
 # make the driver we want to use:
 # this one works by running the algorithm directly

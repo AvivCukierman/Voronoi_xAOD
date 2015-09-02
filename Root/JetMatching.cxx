@@ -63,6 +63,9 @@ EL::StatusCode JetMatching :: initialize ()
 {
   m_event = wk()->xaodEvent();
   m_store = wk()->xaodStore();
+  if(m_doLC) m_jets = "AntiKt4LCTopoJets";
+  else m_jets = "AntiKt4EMTopoJets";
+
   // as a check, let's see the number of events in our xAOD
   Info("initialize()", "Number of events = %lli", m_event->getEntries() ); // print long long int
 

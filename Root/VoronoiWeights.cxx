@@ -23,6 +23,7 @@
 
 // EDM
 #include "xAODCaloEvent/CaloCluster.h"
+#include "xAODCaloEvent/CaloClusterChangeSignalState.h"
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthEventContainer.h"
 #include "xAODTruth/TruthEvent.h"
@@ -70,12 +71,6 @@ EL::StatusCode VoronoiWeights :: initialize ()
   return EL::StatusCode::SUCCESS;
 }
 
-const double PI = 3.14159265358979323844;
-double mod2pi(double phi){
-  while(phi > 2.0*PI) phi -= 2.0*PI;
-  while(phi < 0) phi += 2.0*PI;
-  return phi;
-}
 //Have to define custom comparator for PseudoJets in order to have a map from PJs to anything
 //Comparison is fuzzy to account for rounding errors
 struct VoronoiWeights :: PJcomp {
@@ -94,18 +89,21 @@ EL::StatusCode VoronoiWeights :: execute ()
 
   const xAOD::EventInfo*                        eventInfo     (nullptr);
   const xAOD::CaloClusterContainer*             in_clusters   (nullptr);
-  const xAOD::JetContainer*                     in_jets       (nullptr);
   
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
   if(!m_clust.empty())
     RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug), "Could not get the clusters container.");
-  if(!m_jets.empty())
-    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug), "Could not get the jets container.");
 
   clusters.clear();
+
+  CaloClusterChangeSignalStateList stateHelperList;
   for(const auto clust: *in_clusters){
-    fastjet::PseudoJet test = fastjet::PseudoJet(clust->p4()); //read in clusters as PseudoJets
+    //read in clusters as PseudoJets
+    if(m_doLC) stateHelperList.add(clust,xAOD::CaloCluster::State(1)); //default is calibrated but we can make it explicit anyway
+    else stateHelperList.add(clust,xAOD::CaloCluster::State(0));
+    fastjet::PseudoJet test;
+    test = fastjet::PseudoJet(clust->p4());
     if(clust->e() >= 0) clusters.push_back(test);
   }
 
