@@ -167,10 +167,13 @@ EL::StatusCode WriteTree :: execute ()
 
   m_mu = eventInfo->averageInteractionsPerCrossing();
   m_NPV = 0;
-  for ( auto *ivert : *vertices ){
-    //if ( (ivert)->nTrackParticles() >= 2 ) ++m_NPV;
-    ++m_NPV;
-  }
+  std::cout << vertices->size() <<std::endl;
+  /*for ( auto *ivert : *vertices ){
+    std::cout << "Vertex" << std::endl;
+    for(auto link : ivert->outgoingParticleLinks()){
+      std::cout << link->pt() << std::endl;
+    }
+  }*/
   // fill in all variables
   m_tree->Fill();
 
