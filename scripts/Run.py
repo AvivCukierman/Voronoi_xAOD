@@ -9,7 +9,7 @@ from optparse import OptionParser
 parser = OptionParser()
 
 # job configuration
-parser.add_option("--submitDir", help="dir to store the output", default="submit_dir_z1and2")
+parser.add_option("--submitDir", help="dir to store the output", default="submit_dir_test")
 parser.add_option("--inputDS", help="input DS from DQ2", default="none")
 parser.add_option("--driver", help="select where to run", choices=("direct", "prooflite", "grid"), default="direct")
 parser.add_option("--nevents", type=int, help="number of events to process for all the datasets")
