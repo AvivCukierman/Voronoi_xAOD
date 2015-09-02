@@ -15,7 +15,7 @@ parser.add_option("--inputFiles", type=str, dest='search_directories', help="lis
 parser.add_option("--driver", help="select where to run", choices=("direct", "prooflite", "grid", "lsf"), default="direct")
 parser.add_option("--nevents", type=int, help="number of events to process for all the datasets")
 parser.add_option("--skip-events", type=int, help="skip the first n events")
-parser.add_option("-w", "--overwrite", action='store_true', default=True, help="overwrite previous submitDir")
+parser.add_option("-w", "--overwrite", action='store_true', default=False, help="overwrite previous submitDir")
 # input configuration
 parser.add_option("--dataSource", help="undefined=-1, data=0, FullSim=1, AF-II=2 ", type="int", default=1)
 
