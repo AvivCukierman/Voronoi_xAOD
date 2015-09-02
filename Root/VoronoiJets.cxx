@@ -119,10 +119,17 @@ EL::StatusCode VoronoiJets :: execute ()
   m_store->retrieve(voronoi_clusters, "VoronoiClustersCDV");*/
 
   m_jetReclusteringTool->execute();
-
-/*  const xAOD::JetContainer*                     out_jets       (nullptr);
-  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "voronoi_jets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");*/
-
+  
+  if(m_debug){
+    const xAOD::JetContainer*                     out_jets       (nullptr);
+    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "AntiKt4VoronoiJets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+    for(auto jet: *out_jets){
+      std::cout << "Jet" << std::endl;
+      for(auto constit: jet->getConstituents()){
+        std::cout<< "Constit pT: " << constit->pt() << std::endl; 
+      }
+    }
+  }
   return EL::StatusCode::SUCCESS;
 }
 
