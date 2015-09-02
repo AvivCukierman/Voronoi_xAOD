@@ -10,7 +10,8 @@ parser = OptionParser()
 
 # job configuration
 parser.add_option("--submitDir", help="dir to store the output", default="submit_dir_z1and2")
-parser.add_option("--inputDQ2", dest='use_scanDQ2', action='store_true', help="input DS from DQ2", default=False )
+parser.add_option("--inputDQ2", dest='use_scanDQ2', action='store_true', help="input files from DQ2", default=False )
+parser.add_option("--inputFiles", type=str, dest='search_directories', help="list of input files", default = "/atlas/local/acukierm/dijetz1and2/")
 parser.add_option("--driver", help="select where to run", choices=("direct", "prooflite", "grid", "lsf"), default="direct")
 parser.add_option("--nevents", type=int, help="number of events to process for all the datasets")
 parser.add_option("--skip-events", type=int, help="skip the first n events")
@@ -50,18 +51,18 @@ sh_all = ROOT.SH.SampleHandler()
 
 #search_directories = ["/afs/cern.ch/work/a/amarzin/susy_13TeV/samples/W/"]
 #search_directories = ["/nfs/slac/g/atlas/u01/users/acukierm/xAOD2/MyPackage/scripts"]
-if use_scanDQ2:
+'''if use_scanDQ2:
   search_directories = ["mc15_13TeV.361020.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ0W.merge.AOD.e3569_s2576_s2132_r6765_r6282/"]
   #search_directories = ["user.amarzin.407012.ttbar.DAOD_SUSY10.e4023_s2608_r6765_r6282_p2375_tag_06_v3_output_xAOD.root/"]
 else:
   search_directories = ["/atlas/local/acukierm/dijetz1and2/"]
-
+'''
 # scan for datasets in the given directories
-for directory in search_directories:
-  if use_scanDQ2:
-    ROOT.SH.scanDQ2(sh_all, directory)
-  else:
-    ROOT.SH.scanDir(sh_all, directory)
+directory = options.search_directories
+if use_scanDQ2:
+  ROOT.SH.scanDQ2(sh_all, directory)
+else:
+  ROOT.SH.scanDir(sh_all, directory)
 
 # print out the samples we found
 logging.info("%d different datasets found scanning all directories", len(sh_all))
