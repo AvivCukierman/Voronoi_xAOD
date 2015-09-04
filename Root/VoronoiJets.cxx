@@ -105,6 +105,7 @@ EL::StatusCode VoronoiJets :: execute ()
     else stateHelperList.add(cluster,xAOD::CaloCluster::State(0));
 
     float correctedPt_f = correctedPt(*cluster);
+    //std::cout << correctedPt_f << std::endl; //not all 0
     if(correctedPt_f <= 0) continue;
     if(setClusterP4(cluster,xAOD::JetFourMom_t(correctedPt_f, cluster->eta(), cluster->phi(), cluster->m())) != EL::StatusCode::SUCCESS)
       Error(APP_NAME,"Error in setClusterP4");
