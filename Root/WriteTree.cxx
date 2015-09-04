@@ -215,9 +215,11 @@ EL::StatusCode WriteTree :: execute ()
   if(!m_voronois_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronois_jets,    m_voronois_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
   if(!m_vertices.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(vertices,    m_vertices,       m_event, m_store, m_debug), "Could not get the vertices container.");
 
-  std::cout << "Voronoi0 Jets" << std::endl;
-  for(const auto jet:*voronoi0_jets){
-    std::cout << jet->pt() << std::endl;
+  if(m_debug){
+    std::cout << "Voronoi0 Jets" << std::endl;
+    for(const auto jet:*voronoi0_jets){
+      std::cout << jet->pt() << std::endl;
+    }
   }
   m_eventNumber = eventInfo->eventNumber();
 

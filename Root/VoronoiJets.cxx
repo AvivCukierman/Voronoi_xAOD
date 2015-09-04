@@ -27,6 +27,7 @@
 #include "xAODTruth/TruthEventContainer.h"
 #include "xAODTruth/TruthEvent.h"
 #include "xAODCaloEvent/CaloClusterChangeSignalState.h"
+#include "xAODBase/IParticleHelpers.h"
 
 // Infrastructure include(s):
 #include "xAODRootAccess/Init.h"
@@ -68,7 +69,7 @@ EL::StatusCode VoronoiJets :: changeInput (bool /*firstFile*/) {return EL::Statu
 
 EL::StatusCode VoronoiJets :: initialize ()
 {
-  m_debug = true;
+  m_debug = false;
   m_event = wk()->xaodEvent();
   m_store = wk()->xaodStore();
   // as a check, let's see the number of events in our xAOD
@@ -115,20 +116,18 @@ EL::StatusCode VoronoiJets :: execute ()
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
   if(!m_clust.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug), "Could not get the clusters container.");
 
-  static SG::AuxElement::Decorator< float > voro0Pt("voro0Pt");
-  static SG::AuxElement::Decorator< float > voro1Pt("voro1Pt");
-  static SG::AuxElement::Decorator< float > spreadPt("spreadPt");
+  static SG::AuxElement::ConstAccessor< float > voro0Pt("voro0Pt");
+  static SG::AuxElement::ConstAccessor< float > voro1Pt("voro1Pt");
+  static SG::AuxElement::ConstAccessor< float > spreadPt("spreadPt");
   typedef xAOD::CaloClusterContainer ccc;
 
   CaloClusterChangeSignalStateList stateHelperList;
   for(auto cluster: *(in_clusters)){
     if(m_doLC) stateHelperList.add(cluster,xAOD::CaloCluster::State(1));
     else stateHelperList.add(cluster,xAOD::CaloCluster::State(0));
-    std::cout << voro0Pt(*cluster) << std::endl; //not all 0
   }
 
-  std::cout << "SC" << std::endl;
-  for(int i=0; i<1; i++){
+  for(int i=0; i<3; i++){
     std::pair< ccc*, xAOD::ShallowAuxContainer* > clustersSC = xAOD::shallowCopyContainer( *in_clusters );
     ConstDataVector<ccc>* subset = new ConstDataVector<ccc>(SG::VIEW_ELEMENTS);
     for(auto cluster: *(clustersSC.first)){
@@ -136,7 +135,6 @@ EL::StatusCode VoronoiJets :: execute ()
       if(i==0) correctedPt_f = voro0Pt(*cluster);
       if(i==1) correctedPt_f = voro1Pt(*cluster);
       if(i==2) correctedPt_f = spreadPt(*cluster);
-      if(i==0) std::cout << voro0Pt(*cluster) << std::endl; //all 0
       if(correctedPt_f <= 0) continue;
       if(setClusterP4(cluster,xAOD::JetFourMom_t(correctedPt_f, cluster->eta(), cluster->phi(), cluster->m())) != EL::StatusCode::SUCCESS)
         Error(APP_NAME,"Error in setClusterP4");
