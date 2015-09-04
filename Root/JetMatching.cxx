@@ -78,15 +78,23 @@ EL::StatusCode JetMatching :: execute ()
   const xAOD::EventInfo*                        eventInfo     (nullptr);
   const xAOD::JetContainer*                     in_jets       (nullptr);
   const xAOD::JetContainer*                     truth_jets       (nullptr);
-  const xAOD::JetContainer*                     voronoi_jets       (nullptr);
+  const xAOD::JetContainer*                     voronoi0_jets       (nullptr);
+  const xAOD::JetContainer*                     voronoi1_jets       (nullptr);
+  const xAOD::JetContainer*                     voronoispread_jets       (nullptr);
 
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
   if(!m_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug), "Could not get the jets container.");
   if(!m_truth_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug), "Could not get the truth jets container.");
-  if(!m_voronoi_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi_jets,    m_voronoi_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+  if(!m_voronoi0_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi0_jets,    m_voronoi0_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+  if(!m_voronoi1_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi1_jets,    m_voronoi1_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+  if(!m_voronoispread_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoispread_jets,    m_voronoispread_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
 
-  if(FindTruthMatch(HF::sort_container_pt(voronoi_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
+  if(FindTruthMatch(HF::sort_container_pt(voronoi0_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in FindTruthMatch");
+  if(FindTruthMatch(HF::sort_container_pt(voronoi1_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in FindTruthMatch");
+  if(FindTruthMatch(HF::sort_container_pt(voronoispread_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FindTruthMatch");
 
   if(FindTruthMatch(HF::sort_container_pt(in_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)

@@ -4,7 +4,7 @@ python MyAnalysis/scripts/Run.py \
     --inputFiles "/atlas/local/acukierm/dijetz1and2/" \
     -w \
     --doLC \
-    --nevents 10 \
+    --nevents 1 \
     direct
 
 exit 0
