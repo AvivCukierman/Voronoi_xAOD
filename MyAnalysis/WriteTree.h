@@ -42,7 +42,6 @@ public:
               m_jets           = "AntiKt4LCTopoJets",
               m_truth_jets     = "AntiKt4TruthJets",
               m_voronoi_jets   = "AntiKt4VoronoiJets",
-              //m_vertices       = "TruthVertices";
               m_vertices       = "PrimaryVertices";
   bool m_doLC = false;
 
@@ -74,6 +73,7 @@ private:
   //everything below here is filled in the tree
   int m_eventNumber; //!
   int m_NPV; //!
+  int m_NPVtrue; //!
   int m_mu; //!
 
   std::vector<float> m_jvoro0pt; //!

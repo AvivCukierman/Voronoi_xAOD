@@ -49,6 +49,7 @@ WriteTree :: WriteTree () :
   m_tree(new TTree("oTree", "output tree")),
   m_eventNumber(-999.0),
   m_NPV(-99),
+  m_NPVtrue(-99),
   m_mu(-99),
 
   m_jvoro0pt{ARRAY_INIT},
@@ -115,6 +116,7 @@ EL::StatusCode WriteTree :: initialize ()
 
   m_tree->Branch ("event_number",              &m_eventNumber, "event_number/I");
   m_tree->Branch ("NPV",              &m_NPV, "NPV/I");
+  m_tree->Branch ("NPVTruth",              &m_NPVtrue, "NPVTruth/I");
   m_tree->Branch ("mu",              &m_mu, "mu/I");
 
   m_tree->Branch("jvoro0pt","std::vector<float>", &m_jvoro0pt);
@@ -153,7 +155,7 @@ EL::StatusCode WriteTree :: execute ()
   const xAOD::JetContainer*                     in_jets       (nullptr);
   const xAOD::JetContainer*                     truth_jets    (nullptr);
   const xAOD::JetContainer*                     voronoi_jets  (nullptr);
-  const xAOD::TruthVertexContainer*             vertices      (nullptr);
+  const xAOD::VertexContainer*                  vertices      (nullptr);
   const xAOD::TruthPileupEventContainer*        truthpileupevent (nullptr);
 
   // start grabbing all the containers that we can
@@ -175,7 +177,6 @@ EL::StatusCode WriteTree :: execute ()
 
   //NPVTruth
   std::vector<double> pvs;
-  //auto TruthPileupEvent = Retrieve<xAOD::TruthPileupEventContainer>(event,"TruthPileupEvents");
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(truthpileupevent, "TruthPileupEvents", m_event, m_store, m_debug), "Could not get the truth pileup event container.");
   const xAOD::TruthPileupEvent* evt2 = *truthpileupevent->begin();
   for (unsigned int ip = 0; ip < evt2->nTruthParticles(); ++ip) {
@@ -189,8 +190,13 @@ EL::StatusCode WriteTree :: execute ()
   }
   std::sort( pvs.begin(), pvs.end() );
   pvs.erase( std::unique( pvs.begin(), pvs.end() ), pvs.end() );
+  m_NPVtrue = pvs.size();
 
-  m_NPV = pvs.size();
+  //NPVreco
+  m_NPV = 0;
+  for ( auto *ivert : *vertices ){
+    if ( (ivert)->nTrackParticles() >= 2 ) ++m_NPV;
+  }
 
   // fill in all variables
   m_tree->Fill();
