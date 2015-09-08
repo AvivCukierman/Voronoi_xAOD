@@ -43,6 +43,7 @@ public:
               m_jets          = "AntiKt4LCTopoJets",
               m_truth_jets          = "AntiKt4TruthJets",
               m_voronoi_jets          = "AntiKt4VoronoiJets";
+  bool m_doLC = false;
 
    // methods used in the analysis
   EL::StatusCode FindTruthMatch(DataVector<xAOD::Jet_v1>, DataVector<xAOD::Jet_v1>);

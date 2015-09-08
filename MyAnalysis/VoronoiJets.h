@@ -44,6 +44,7 @@ public:
   std::string m_eventInfo      = "EventInfo",
               m_clust          = "CaloCalTopoClusters",
               m_jets          = "AntiKt4LCTopoJets";
+  bool m_doLC = false;
 
    // methods used in the analysis
   virtual EL::StatusCode setClusterP4(xAOD::CaloCluster*, const xAOD::JetFourMom_t&);

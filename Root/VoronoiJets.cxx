@@ -26,6 +26,7 @@
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthEventContainer.h"
 #include "xAODTruth/TruthEvent.h"
+#include "xAODCaloEvent/CaloClusterChangeSignalState.h"
 
 // Infrastructure include(s):
 #include "xAODRootAccess/Init.h"
@@ -89,19 +90,22 @@ EL::StatusCode VoronoiJets :: execute ()
   const char* APP_NAME = "VoronoiJets::execute()";
   const xAOD::EventInfo*                        eventInfo     (nullptr);
   const xAOD::CaloClusterContainer*             in_clusters   (nullptr);
-  const xAOD::JetContainer*                     in_jets       (nullptr);
 
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
   if(!m_clust.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug), "Could not get the clusters container.");
-  if(!m_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug), "Could not get the jets container.");
 
   static SG::AuxElement::ConstAccessor< float > correctedPt("correctedPt");
   typedef xAOD::CaloClusterContainer ccc;
   ConstDataVector<ccc>* subset = new ConstDataVector<ccc>(SG::VIEW_ELEMENTS);
   std::pair< ccc*, xAOD::ShallowAuxContainer* > clustersSC = xAOD::shallowCopyContainer( *in_clusters );
+  CaloClusterChangeSignalStateList stateHelperList;
   for(auto cluster: *(clustersSC.first)){
+    if(m_doLC) stateHelperList.add(cluster,xAOD::CaloCluster::State(1));
+    else stateHelperList.add(cluster,xAOD::CaloCluster::State(0));
+
     float correctedPt_f = correctedPt(*cluster);
+    //std::cout << correctedPt_f << std::endl; //not all 0
     if(correctedPt_f <= 0) continue;
     if(setClusterP4(cluster,xAOD::JetFourMom_t(correctedPt_f, cluster->eta(), cluster->phi(), cluster->m())) != EL::StatusCode::SUCCESS)
       Error(APP_NAME,"Error in setClusterP4");
@@ -116,10 +120,17 @@ EL::StatusCode VoronoiJets :: execute ()
   m_store->retrieve(voronoi_clusters, "VoronoiClustersCDV");*/
 
   m_jetReclusteringTool->execute();
-
-/*  const xAOD::JetContainer*                     out_jets       (nullptr);
-  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "voronoi_jets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");*/
-
+  
+  if(m_debug){
+    const xAOD::JetContainer*                     out_jets       (nullptr);
+    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "AntiKt4VoronoiJets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+    for(auto jet: *out_jets){
+      std::cout << "Jet" << std::endl;
+      for(auto constit: jet->getConstituents()){
+        std::cout<< "Constit pT: " << constit->pt() << std::endl; 
+      }
+    }
+  }
   return EL::StatusCode::SUCCESS;
 }
 
