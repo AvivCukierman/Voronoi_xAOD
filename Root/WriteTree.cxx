@@ -27,6 +27,8 @@
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthEventContainer.h"
 #include "xAODTruth/TruthEvent.h"
+#include "xAODTruth/TruthPileupEvent.h"
+#include "xAODTruth/TruthPileupEventContainer.h"
 #include "xAODTruth/TruthVertexContainer.h"
 
 // Infrastructure include(s):
@@ -148,7 +150,8 @@ EL::StatusCode WriteTree :: execute ()
   const xAOD::JetContainer*                     in_jets       (nullptr);
   const xAOD::JetContainer*                     truth_jets    (nullptr);
   const xAOD::JetContainer*                     voronoi_jets  (nullptr);
-  const xAOD::TruthVertexContainer*                  vertices      (nullptr);
+  const xAOD::TruthVertexContainer*             vertices      (nullptr);
+  const xAOD::TruthPileupEventContainer*        truthpileupevent (nullptr);
 
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
@@ -166,14 +169,26 @@ EL::StatusCode WriteTree :: execute ()
     Error(APP_NAME,"Error in FillJetVars");
 
   m_mu = eventInfo->averageInteractionsPerCrossing();
-  m_NPV = 0;
-  std::cout << vertices->size() <<std::endl;
-  /*for ( auto *ivert : *vertices ){
-    std::cout << "Vertex" << std::endl;
-    for(auto link : ivert->outgoingParticleLinks()){
-      std::cout << link->pt() << std::endl;
-    }
-  }*/
+
+  //NPVTruth
+  std::vector<double> pvs;
+  //auto TruthPileupEvent = Retrieve<xAOD::TruthPileupEventContainer>(event,"TruthPileupEvents");
+  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(truthpileupevent, "TruthPileupEvents", m_event, m_store, m_debug), "Could not get the truth pileup event container.");
+  const xAOD::TruthPileupEvent* evt2 = *truthpileupevent->begin();
+  for (unsigned int ip = 0; ip < evt2->nTruthParticles(); ++ip) {
+    const xAOD::TruthParticle* tp = evt2->truthParticle(ip);
+    fastjet::PseudoJet part(tp->p4().Px(), tp->p4().Py(), tp->p4().Pz(), tp->p4().E());
+    if (!tp->hasProdVtx ()) continue;
+    double origin_x = tp->prodVtx()->x();
+    double origin_y = tp->prodVtx()->y();
+    double origin_z = tp->prodVtx()->z();
+    pvs.push_back(origin_x);
+  }
+  std::sort( pvs.begin(), pvs.end() );
+  pvs.erase( std::unique( pvs.begin(), pvs.end() ), pvs.end() );
+
+  m_NPV = pvs.size();
+
   // fill in all variables
   m_tree->Fill();
 
