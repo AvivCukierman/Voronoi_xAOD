@@ -64,7 +64,8 @@ directory = options.search_directories
 if use_scanDQ2:
   ROOT.SH.scanDQ2(sh_all, directory)
 else:
-  ROOT.SH.scanDir(sh_all, directory)
+  # ROOT.SH.scanDir(sh_all, directory)
+  ROOT.SH.ScanDir().samplePattern("mc15_13TeV.361021.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ1W.merge.AOD.e3569_s2576_s2132_r7042_r6282_tid06394424_00*").scan(sh_all,directory)
 
 # print out the samples we found
 logging.info("%d different datasets found scanning all directories", len(sh_all))
