@@ -227,57 +227,49 @@ void VoronoiWeights::SpreadPt(std::vector< std::pair< fastjet::PseudoJet,std::ve
     isPositive[iCl] = spreadPT[iCl]>0;
   }
 
-    /*int iclosest=0;
-      float drmin=100;
-      if(i==3)        cout << "dr: " << endl;
-      for(int j = 0; j < clusters; j++){
-
-      if(!(spreadPT[j]>0)) continue;
-      float dr=cluster(i,key).p.DeltaR(cluster(j,key).p);
-      if(dr<drmin) {drmin=dr; iclosest=j;}
-      }*/
-
-  //Requires ANN:
-  /*ANNpointArray points = annAllocPts(2*clusters,2);
-  for(int i=0; i<clusters; i++){
-    //set up points to look through: phi in [-pi,3pi]
-    points[i][0] = correctedptvec[iCl].first.Eta();
-    points[i][1] = correctedptvec[iCl].first.Phi();
-    points[clusters+i][0] = correctedptvec[iCl].first.Eta();
-    points[clusters+i][1] = correctedptvec[iCl].first.Phi()+2*PI;
+  std::vector<std::vector<std::pair<int,float> > > cluster_drs; //for each cluster, list of nearby positive pT clusters and their distances
+  for(int iCl = 0; iCl < clusters; iCl++){
+    fastjet::PseudoJet icluster = correctedptvec[iCl].first;
+    float ieta = icluster.eta();
+    float iphi = icluster.phi();
+    std::vector<std::pair<int,float> > this_cluster_drs;
+    for(int jCl = 0; jCl < clusters; jCl++){
+      if(iCl == jCl) continue;
+      if(!isPositive[jCl]) continue;
+      fastjet::PseudoJet jcluster = correctedptvec[jCl].first;
+      float jeta = jcluster.eta();
+      float jphi = jcluster.phi();
+      float dphi = icluster.delta_phi_to(jcluster);
+      float deta = icluster.eta() - jcluster.eta(); //fastjet::pseudojet::delta_R(const PseudoJet& other) gives rap-phi distance
+      float dr2 = pow(dphi,2) + pow(deta,2);
+      if(dr2 > pow(spreadr,2)) continue;
+      std::pair<int,float> jdrpair (jCl,dr2);
+      this_cluster_drs.push_back(jdrpair);
+    }
+    cluster_drs.push_back(this_cluster_drs);
   }
 
   for(int i = 0; i < clusters; i++){
-    if(!(spreadPT[i]<0)) continue;
+    if(!(spreadPT[i]<0)) continue; //only spread from negative pT clusters
     //find closest positive PT cluster:
-    ANNpoint qpoint = annAllocPt(2,0);
-    qpoint[0] = correctedptvec[iCl].first.Eta();
-    qpoint[1] = correctedptvec[iCl].first.Phi();
-    qpoint[1]+=2*PI*(qpoint[1]<0); //point you're looking at has phi in [0,2pi]
-
-    ANNdist radius = spreadr*spreadr;
-    ANNkd_tree* kdTree = new ANNkd_tree(points,2*clusters,2);
-    ANNidxArray nnIdx = new ANNidx[2*clusters];
-    ANNdistArray dists = new ANNdist[2*clusters];
-    int nclfound = kdTree->annkFRSearch(qpoint,radius,2*clusters,nnIdx,dists,0.0);
-    //cout << "i: " << i << " Eta: " << points[i][0] << " Phi: " << points[i][1] << " Pt: " << spreadPT[i] << endl;
     float sumdR2 = 0;
-    for(int j=0; j<nclfound; j++){
-      int realid = nnIdx[j]%clusters;
-      if(!isPositive[realid]) continue; //only spread to positive PT cells
+    //iterate over nearby positive pT clusters
+    for(int j=0; j<cluster_drs[i].size(); j++){
       //cout << "j: " << j << " realid: " << realid << " Eta: " << points[realid][0]<< " Phi: " << points[realid][1] << " Pt:" << spreadPT[realid] << " Dist: " << dists[j] << endl;  // dists[j] = dR^2
-      if(dists[j]>0) sumdR2 += 1./(pow(dists[j],alpha/2));
+      float dr = cluster_drs[i][j].second;
+      if(dr>0) sumdR2 += 1./(pow(dr,alpha/2));
     }
-    //if more than one neighbor
+    //if at least one neighbor
     if(sumdR2 > 0){
       float spreadPT_orig = spreadPT[i];
-      //cout << "orig: " << spreadPT_orig << endl;
-      for(int j=0; j<nclfound; j++){
-        int realid = nnIdx[j]%clusters;
-        if(!isPositive[realid]) continue; //only spread to positive (or formerly positive) PT cells
-        if(dists[j]>0){
-          float weight = (1./pow(dists[j],alpha/2))/sumdR2;
-          //cout << weight << ";" << weight*spreadPT_orig << ";" << spreadPT[realid] << endl;
+      //std::cout << "orig: " << spreadPT_orig << std::endl;
+      for(int j=0; j<cluster_drs[i].size(); j++){
+        float dr = cluster_drs[i][j].second;
+        float realid = cluster_drs[i][j].first;
+        if(dr>0){
+          float weight = (1./pow(dr,alpha/2))/sumdR2;
+          //std::cout << dr << "; " << weight << std::endl;
+          //std::cout << "Before spreading: " << weight << ";" << weight*spreadPT_orig << ";" << spreadPT[realid] << std::endl;
           if(fabs(weight*spreadPT_orig)>spreadPT[realid]){
             spreadPT[i]+=spreadPT[realid];
             spreadPT[realid]=0;
@@ -286,19 +278,13 @@ void VoronoiWeights::SpreadPt(std::vector< std::pair< fastjet::PseudoJet,std::ve
             spreadPT[realid]+=weight*spreadPT_orig;
             spreadPT[i]-=weight*spreadPT_orig;
           }
-          //cout << weight << ";" << weight*spreadPT_orig << ";" << spreadPT[realid] << endl;
+          //std::cout << "After spreading: " << weight << ";" << weight*spreadPT_orig << ";" << spreadPT[realid] << std::endl;
         }
       }
-      //cout << "final: "  << spreadPT[i] << endl;
+      //std::cout << "final: "  << spreadPT[i] << std::endl;
     }
     //cout << i << ";" << cluster(i,key).Float("correctedPT") << ";" << spreadPT[i]<< endl;
-    annDeallocPt(qpoint);
-    delete [] nnIdx;
-    delete [] dists;
-    delete kdTree;
   }
-  annDeallocPts(points);
-  annClose();*/
 
   /*float totalcorrpt=0, totalspreadpt=0;
     for(int i=0; i<clusters; i++){ totalcorrpt+=cluster(i,key).Float("correctedPT"); totalspreadpt+=spreadPT[i];}
