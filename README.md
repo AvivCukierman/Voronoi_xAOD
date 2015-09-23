@@ -12,6 +12,7 @@ rcSetup Base,2.3.23
 git clone https://github.com/kratsg/xAODJetReclustering
 git clone https://github.com/UCATLAS/xAODAnaHelpers
 git clone https://github.com/AvivCukierman/Voronoi_xAOD
+mv Voronoi_xAOD MyAnalysis
 rc find_packages
 rc compile
 ```
