@@ -11,6 +11,7 @@ mkdir myRootCore && cd $_
 rcSetup Base,2.3.23
 git clone https://github.com/kratsg/xAODJetReclustering
 git clone https://github.com/UCATLAS/xAODAnaHelpers
+git clone https://github.com/AvivCukierman/Voronoi_xAOD
 rc find_packages
 rc compile
 ```
