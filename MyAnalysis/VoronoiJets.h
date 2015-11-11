@@ -55,7 +55,9 @@ public:
 private:
   xAOD::TEvent *m_event; //!
   xAOD::TStore *m_store;  //!
-  JetReclusteringTool *m_jetReclusteringTool; //!
+  //3 JetReclusteringTools for voro0,voro1,spread:
+  //JetReclusteringTool *m_jetReclusteringTool; //!
+  std::array<JetReclusteringTool*, 3> m_jetReclusteringTools; //!
   //Cluster collections:
 public:
   // this is a standard constructor

@@ -61,6 +61,32 @@ WriteTree :: WriteTree () :
   m_tjvoro0width{ARRAY_INIT},
   m_tjvoro0mindr{ARRAY_INIT},
 
+  m_jvoro1pt{ARRAY_INIT},
+  m_jvoro1eta{ARRAY_INIT},
+  m_jvoro1phi{ARRAY_INIT},
+  m_jvoro1mass{ARRAY_INIT},
+  m_jvoro1width{ARRAY_INIT},
+  m_jvoro1mindr{ARRAY_INIT},
+  m_tjvoro1pt{ARRAY_INIT},
+  m_tjvoro1eta{ARRAY_INIT},
+  m_tjvoro1phi{ARRAY_INIT},
+  m_tjvoro1mass{ARRAY_INIT},
+  m_tjvoro1width{ARRAY_INIT},
+  m_tjvoro1mindr{ARRAY_INIT},
+
+  m_jvorospt{ARRAY_INIT},
+  m_jvoroseta{ARRAY_INIT},
+  m_jvorosphi{ARRAY_INIT},
+  m_jvorosmass{ARRAY_INIT},
+  m_jvoroswidth{ARRAY_INIT},
+  m_jvorosmindr{ARRAY_INIT},
+  m_tjvorospt{ARRAY_INIT},
+  m_tjvoroseta{ARRAY_INIT},
+  m_tjvorosphi{ARRAY_INIT},
+  m_tjvorosmass{ARRAY_INIT},
+  m_tjvoroswidth{ARRAY_INIT},
+  m_tjvorosmindr{ARRAY_INIT},
+
   m_j0pt{ARRAY_INIT},
   m_j0eta{ARRAY_INIT},
   m_j0phi{ARRAY_INIT},
@@ -127,6 +153,32 @@ EL::StatusCode WriteTree :: initialize ()
   m_tree->Branch("tjvoro0width","std::vector<float>", &m_tjvoro0width);
   m_tree->Branch("tjvoro0mindr","std::vector<float>", &m_tjvoro0mindr);
 
+  m_tree->Branch("jvoro1pt","std::vector<float>", &m_jvoro1pt);
+  m_tree->Branch("jvoro1eta","std::vector<float>", &m_jvoro1eta);
+  m_tree->Branch("jvoro1phi","std::vector<float>", &m_jvoro1phi);
+  m_tree->Branch("jvoro1mass","std::vector<float>", &m_jvoro1mass);
+  m_tree->Branch("jvoro1width","std::vector<float>", &m_jvoro1width);
+  m_tree->Branch("jvoro1mindr","std::vector<float>", &m_jvoro1mindr);
+  m_tree->Branch("tjvoro1pt","std::vector<float>", &m_tjvoro1pt);
+  m_tree->Branch("tjvoro1eta","std::vector<float>", &m_tjvoro1eta);
+  m_tree->Branch("tjvoro1phi","std::vector<float>", &m_tjvoro1phi);
+  m_tree->Branch("tjvoro1m","std::vector<float>", &m_tjvoro1mass);
+  m_tree->Branch("tjvoro1width","std::vector<float>", &m_tjvoro1width);
+  m_tree->Branch("tjvoro1mindr","std::vector<float>", &m_tjvoro1mindr);
+
+  m_tree->Branch("jvorospt","std::vector<float>", &m_jvorospt);
+  m_tree->Branch("jvoroseta","std::vector<float>", &m_jvoroseta);
+  m_tree->Branch("jvorosphi","std::vector<float>", &m_jvorosphi);
+  m_tree->Branch("jvorosmass","std::vector<float>", &m_jvorosmass);
+  m_tree->Branch("jvoroswidth","std::vector<float>", &m_jvoroswidth);
+  m_tree->Branch("jvorosmindr","std::vector<float>", &m_jvorosmindr);
+  m_tree->Branch("tjvorospt","std::vector<float>", &m_tjvorospt);
+  m_tree->Branch("tjvoroseta","std::vector<float>", &m_tjvoroseta);
+  m_tree->Branch("tjvorosphi","std::vector<float>", &m_tjvorosphi);
+  m_tree->Branch("tjvorosm","std::vector<float>", &m_tjvorosmass);
+  m_tree->Branch("tjvoroswidth","std::vector<float>", &m_tjvoroswidth);
+  m_tree->Branch("tjvorosmindr","std::vector<float>", &m_tjvorosmindr);
+
   m_tree->Branch("j0pt","std::vector<float>", &m_j0pt);
   m_tree->Branch("j0eta","std::vector<float>", &m_j0eta);
   m_tree->Branch("j0phi","std::vector<float>", &m_j0phi);
@@ -149,19 +201,33 @@ EL::StatusCode WriteTree :: execute ()
   const xAOD::EventInfo*                        eventInfo     (nullptr);
   const xAOD::JetContainer*                     in_jets       (nullptr);
   const xAOD::JetContainer*                     truth_jets    (nullptr);
-  const xAOD::JetContainer*                     voronoi_jets  (nullptr);
+  const xAOD::JetContainer*                     voronoi0_jets  (nullptr);
+  const xAOD::JetContainer*                     voronoi1_jets  (nullptr);
+  const xAOD::JetContainer*                     voronois_jets  (nullptr);
   const xAOD::VertexContainer*                  vertices      (nullptr);
 
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
   if(!m_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug), "Could not get the jets container.");
   if(!m_truth_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug), "Could not get the truth jets container.");
-  if(!m_voronoi_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi_jets,    m_voronoi_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+  if(!m_voronoi0_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi0_jets,    m_voronoi0_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+  if(!m_voronoi1_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi1_jets,    m_voronoi1_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+  if(!m_voronois_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronois_jets,    m_voronois_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
   if(!m_vertices.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(vertices,    m_vertices,       m_event, m_store, m_debug), "Could not get the vertices container.");
 
+  if(m_debug){
+    std::cout << "Voronoi0 Jets" << std::endl;
+    for(const auto jet:*voronoi0_jets){
+      std::cout << jet->pt() << std::endl;
+    }
+  }
   m_eventNumber = eventInfo->eventNumber();
 
-  if(FillJetVars(voronoi_jets,truth_jets,m_jvoro0pt,m_jvoro0eta,m_jvoro0phi,m_jvoro0mass,m_jvoro0width,m_jvoro0mindr,m_tjvoro0pt,m_tjvoro0eta,m_tjvoro0phi,m_tjvoro0mass,m_tjvoro0width,m_tjvoro0mindr) != EL::StatusCode::SUCCESS)
+  if(FillJetVars(voronoi0_jets,truth_jets,m_jvoro0pt,m_jvoro0eta,m_jvoro0phi,m_jvoro0mass,m_jvoro0width,m_jvoro0mindr,m_tjvoro0pt,m_tjvoro0eta,m_tjvoro0phi,m_tjvoro0mass,m_tjvoro0width,m_tjvoro0mindr) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in FillJetVars");
+  if(FillJetVars(voronoi1_jets,truth_jets,m_jvoro1pt,m_jvoro1eta,m_jvoro1phi,m_jvoro1mass,m_jvoro1width,m_jvoro1mindr,m_tjvoro1pt,m_tjvoro1eta,m_tjvoro1phi,m_tjvoro1mass,m_tjvoro1width,m_tjvoro1mindr) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in FillJetVars");
+  if(FillJetVars(voronois_jets,truth_jets,m_jvorospt,m_jvoroseta,m_jvorosphi,m_jvorosmass,m_jvoroswidth,m_jvorosmindr,m_tjvorospt,m_tjvoroseta,m_tjvorosphi,m_tjvorosmass,m_tjvoroswidth,m_tjvorosmindr) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FillJetVars");
 
   if(FillJetVars(in_jets,truth_jets,m_j0pt,m_j0eta,m_j0phi,m_j0mass,m_j0width,m_j0mindr,m_tj0pt,m_tj0eta,m_tj0phi,m_tj0mass,m_tj0width,m_tj0mindr) != EL::StatusCode::SUCCESS)

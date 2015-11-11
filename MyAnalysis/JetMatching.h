@@ -42,7 +42,9 @@ public:
               m_clust          = "CaloCalTopoClusters",
               m_jets          = "AntiKt4LCTopoJets",
               m_truth_jets          = "AntiKt4TruthJets",
-              m_voronoi_jets          = "AntiKt4VoronoiJets";
+              m_voronoi0_jets          = "AntiKt4Voronoi0Jets",
+              m_voronoi1_jets          = "AntiKt4Voronoi1Jets",
+              m_voronoispread_jets          = "AntiKt4VoronoiSpreadJets";
   bool m_doLC = false;
 
    // methods used in the analysis

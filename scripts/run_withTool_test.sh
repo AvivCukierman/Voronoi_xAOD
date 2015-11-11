@@ -1,5 +1,5 @@
 #!/bin/bash
-python MyAnalysis/scripts/Run.py \
+python MyAnalysis/scripts/Run_withTool.py \
     --submitDir "test_LC" \
     -w \
     --inputFiles "/atlas/local/acukierm/dijetz1and2/" \

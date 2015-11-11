@@ -94,18 +94,18 @@ if options.skip_events:
 
 # add our algorithm to the job
 logging.info("creating algorithms")
-voronoiweights = ROOT.VoronoiWeights()
+myxaodanalysis = ROOT.MyxAODAnalysis()
 voronoijets = ROOT.VoronoiJets()
 jetmatching = ROOT.JetMatching()
 writetree = ROOT.WriteTree()
 
-setattr(voronoiweights, 'm_doLC', options.doLC)
+#setattr(voronoiweights, 'm_doLC', options.doLC)
 setattr(voronoijets, 'm_doLC', options.doLC)
 setattr(jetmatching, 'm_doLC', options.doLC)
 setattr(writetree, 'm_doLC', options.doLC)
 
 logging.info("adding algorithms")
-job.algsAdd(voronoiweights)
+job.algsAdd(myxaodanalysis)
 job.algsAdd(voronoijets)
 job.algsAdd(jetmatching)
 job.algsAdd(writetree)

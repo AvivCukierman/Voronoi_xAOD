@@ -41,7 +41,9 @@ public:
   std::string m_eventInfo      = "EventInfo",
               m_jets           = "AntiKt4LCTopoJets",
               m_truth_jets     = "AntiKt4TruthJets",
-              m_voronoi_jets   = "AntiKt4VoronoiJets",
+              m_voronoi0_jets   = "AntiKt4Voronoi0Jets",
+              m_voronoi1_jets   = "AntiKt4Voronoi1Jets",
+              m_voronois_jets   = "AntiKt4VoronoiSpreadJets",
               m_vertices       = "PrimaryVertices";
   bool m_doLC = false;
 
@@ -87,6 +89,32 @@ private:
   std::vector<float> m_tjvoro0mass; //!
   std::vector<float> m_tjvoro0width; //!
   std::vector<float> m_tjvoro0mindr; //!
+
+  std::vector<float> m_jvoro1pt; //!
+  std::vector<float> m_jvoro1eta; //!
+  std::vector<float> m_jvoro1phi; //!
+  std::vector<float> m_jvoro1mass; //!
+  std::vector<float> m_jvoro1width; //!
+  std::vector<float> m_jvoro1mindr; //!
+  std::vector<float> m_tjvoro1pt; //!
+  std::vector<float> m_tjvoro1eta; //!
+  std::vector<float> m_tjvoro1phi; //!
+  std::vector<float> m_tjvoro1mass; //!
+  std::vector<float> m_tjvoro1width; //!
+  std::vector<float> m_tjvoro1mindr; //!
+
+  std::vector<float> m_jvorospt; //!
+  std::vector<float> m_jvoroseta; //!
+  std::vector<float> m_jvorosphi; //!
+  std::vector<float> m_jvorosmass; //!
+  std::vector<float> m_jvoroswidth; //!
+  std::vector<float> m_jvorosmindr; //!
+  std::vector<float> m_tjvorospt; //!
+  std::vector<float> m_tjvoroseta; //!
+  std::vector<float> m_tjvorosphi; //!
+  std::vector<float> m_tjvorosmass; //!
+  std::vector<float> m_tjvoroswidth; //!
+  std::vector<float> m_tjvorosmindr; //!
 
   std::vector<float> m_j0pt; //!
   std::vector<float> m_j0eta; //!
