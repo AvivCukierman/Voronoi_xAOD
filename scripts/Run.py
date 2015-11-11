@@ -141,5 +141,5 @@ elif (options.driver == "grid"):
 elif (options.driver == "lsf"):
   logging.info("running on LSF")
   driver = ROOT.EL.LSFDriver()
-  driver.options().setString(ROOT.EL.Job.optSubmitFlags, '-q short')
+  driver.options().setString(ROOT.EL.Job.optSubmitFlags, '-q medium')
   driver.submitOnly(job, options.submitDir)
