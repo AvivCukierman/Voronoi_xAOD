@@ -104,16 +104,30 @@ EL::StatusCode JetMatching :: execute ()
     Error(APP_NAME,"Error in SetMinDR (only one jet in event?)");
 
   //To check truth matches:
-  //DataVector<xAOD::Jet_v1> sorted_truth_jets = HF::sort_container_pt(truth_jets);
-  /*static SG::AuxElement::ConstAccessor< int > truth_match_i("truth_match_i");
-  std::cout << "Voronoi" << std::endl;
-  for(auto jet: *voronoi_jets){
-    std::cout << jet->pt() << std:: endl;
-    int truthmatch = truth_match_i(*jet);
-    std::cout << truthmatch  << std::endl;
-    std::cout << sorted_truth_jets.at(truthmatch)->pt() << std::endl;
-  }*/
+  m_debug = true;
+  if(m_debug){
+    int event_number = eventInfo->eventNumber(); //added
+    if(event_number == 455939){
+    DataVector<xAOD::Jet_v1> sorted_truth_jets = HF::sort_container_pt(truth_jets);
+    static SG::AuxElement::ConstAccessor< int > truth_match_i("truth_match_i");
+    for(auto jet: *voronoispread_jets){
+      std::cout << "Reco jet: " << jet->pt() << "\t" << jet->eta() << "\t" << jet->phi() << "\t" << jet->m() << std::endl;
+      int truthmatch = truth_match_i(*jet);
+      if(truthmatch>-1){
+        auto tjet =  sorted_truth_jets.at(truthmatch);
+        std::cout << "True jet: " << tjet->pt() << "\t" << tjet->eta() << "\t" << tjet->phi() << "\t" << tjet->m() << std::endl;
+      }
+    }
+    }
 
+    char filename[50];
+    sprintf(filename,"truth_jets_%i",event_number);
+    std::ofstream fout(filename);
+    for(auto jet: *truth_jets){
+      fout << jet->pt() << "\t" << jet->eta() << "\t" << jet->phi() << "\t" << jet->m() << std::endl;
+    }
+  }
+  m_debug = false;
   //To check minDR:
   /*static SG::AuxElement::ConstAccessor< float > minDR("minDR");
   for(auto jet: *truth_jets){
