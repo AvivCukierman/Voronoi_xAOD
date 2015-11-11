@@ -1,6 +1,7 @@
 #include <vector>
 #include <map>
 #include <math.h>
+#include <ios>
 
 // event loop
 #include <EventLoop/Job.h>
@@ -71,6 +72,7 @@ EL::StatusCode VoronoiWeights :: initialize ()
   // as a check, let's see the number of events in our xAOD
   Info("initialize()", "Number of events = %lli", m_event->getEntries() ); // print long long int
 
+
   return EL::StatusCode::SUCCESS;
 }
 
@@ -126,6 +128,7 @@ EL::StatusCode VoronoiWeights :: execute ()
       std::cout << "CDV Pt: " << clust->pt() << "; E: " << clust->e()<< std::endl;
       std::cout << "PT Vec Pt: " << ptvec[i].first.pt() << "; E: " << ptvec[i].first.e()<< std::endl;
     }
+    
 
     //There should be the same number of positive E Clusters in the CDV as clusters in the ptvec
     bool endCDV = clust->e()<=0;
@@ -136,6 +139,7 @@ EL::StatusCode VoronoiWeights :: execute ()
       return EL::StatusCode::FAILURE;
     }
     else{
+      if(m_debug) std::cout << clust->pt() << "\t" << clust->eta() << "\t" << clust->phi() << "\t" << clust->m() << "\t" << ptvec[i].second[0] << "\t" << ptvec[i].second[3] << std::endl;
       voro0Pt(*clust) = ptvec[i].second[1];
       voro1Pt(*clust) = ptvec[i].second[2];
       spreadPt(*clust) = ptvec[i].second[3];

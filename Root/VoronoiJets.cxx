@@ -115,6 +115,7 @@ EL::StatusCode VoronoiJets :: execute ()
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
   if(!m_clust.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug), "Could not get the clusters container.");
+  //int event_number = eventInfo->eventNumber(); //added
 
   static SG::AuxElement::ConstAccessor< float > voro0Pt("voro0Pt");
   static SG::AuxElement::ConstAccessor< float > voro1Pt("voro1Pt");
@@ -161,10 +162,10 @@ EL::StatusCode VoronoiJets :: execute ()
   }
   if(m_debug){
     const xAOD::CaloClusterContainer* voronoi_clusters(nullptr);
-    m_store->retrieve(voronoi_clusters, "Voronoi0ClustersCDV");
+    m_store->retrieve(voronoi_clusters, "VoronoiSpreadClustersCDV");
     std::cout << "Clusters" << std::endl;
     for(auto cluster:*voronoi_clusters){
-      std::cout << cluster->pt() << std::endl;
+      std::cout << cluster->pt() << ";" << cluster->eta() << ";" << cluster->phi() << ";" << cluster->m() << std::endl;
     }
   }
 
@@ -172,9 +173,9 @@ EL::StatusCode VoronoiJets :: execute ()
   
   if(m_debug){
     const xAOD::JetContainer*                     out_jets       (nullptr);
-    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "AntiKt4Voronoi0Jets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "AntiKt4VoronoiSpreadJets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
     for(auto jet: *out_jets){
-      std::cout << "Jet" << std::endl;
+      std::cout << "Jet: " << jet->pt() << ";" << jet->eta() << ";" << jet->phi() << ";" << jet->m() << std::endl;
       for(auto constit: jet->getConstituents()){
         std::cout<< "Constit pT: " << constit->pt() << std::endl; 
       }
