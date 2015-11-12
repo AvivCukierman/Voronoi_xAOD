@@ -34,6 +34,9 @@
 
 #include <VoronoiWeightTool/VoronoiWeightTool.h>
 
+//Reclustering
+#include <xAODJetReclustering/JetReclusteringTool.h>
+
 //#include "MyAnalysis/Candidate.h"
 //#include "MyAnalysis/constituentTests.h"
 
@@ -56,6 +59,7 @@ public:
   int EventNumber; //!
   bool m_debug = false;
   VoronoiWeightTool* m_VoronoiTool;
+  JetReclusteringTool* m_jetReclusteringTool;
 
 
   // this is a standard constructor
