@@ -58,8 +58,15 @@ public:
 
   int EventNumber; //!
   bool m_debug = false;
-  VoronoiWeightTool* m_VoronoiTool;
-  JetReclusteringTool* m_jetReclusteringTool;
+  bool m_doLC = false;
+  std::array<VoronoiWeightTool*, 3> m_voronoiWeightTools; //!
+  std::array<JetReclusteringTool*, 3> m_jetReclusteringTools; //!
+
+  std::string m_inputContainer = "CaloCalTopoClusters",
+              m_outputContainer = "VoronoiClusters";
+
+  EL::StatusCode FindRho(const xAOD::CaloClusterContainer* in_clusters,float& rho, float& sigma);
+  EL::StatusCode SetRho(DataVector<xAOD::Jet_v1> jets,float event_rho);
 
 
   // this is a standard constructor
