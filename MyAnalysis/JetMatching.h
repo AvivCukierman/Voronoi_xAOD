@@ -40,7 +40,7 @@ public:
   bool m_debug = false;
   std::string m_eventInfo      = "EventInfo",
               m_clust          = "CaloCalTopoClusters",
-              m_jets          = "AntiKt4LCTopoJets",
+              m_jets          = "AntiKt4NoAreaJets",
               m_truth_jets          = "AntiKt4TruthJets",
               m_voronoi0_jets          = "AntiKt4Voronoi0Jets",
               m_voronoi1_jets          = "AntiKt4Voronoi1Jets",

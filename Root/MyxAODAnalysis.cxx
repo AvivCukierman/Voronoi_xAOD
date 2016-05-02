@@ -216,8 +216,19 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(test_jets,     outputContainer,       m_event, m_store, m_debug), "Could not get the jets container.");
   SetRho(HF::sort_container_pt(test_jets),event_rho);
 
-  //static SG::AuxElement::ConstAccessor< float > rho("rho");
-  //for(auto jet: *test_jets) std::cout << rho(*jet) << std::endl;
+  /*static SG::AuxElement::ConstAccessor< float > rho("rho");
+  for(auto jet: *test_jets){
+    float activeArea(-99.0);
+    jet->getAttribute("ActiveArea", activeArea);
+    if(jet->pt() > 5000) std::cout << "Custom: " << jet->pt()-rho(*jet)*activeArea << std::endl;
+  }
+
+  const xAOD::JetContainer * oldjets (nullptr);
+  std::string m_oldjets = "AntiKt4EMTopoJets";
+  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(oldjets,     m_oldjets,       m_event, m_store, m_debug), "Could not get the jets container.");
+  for(auto jet: *oldjets){
+    std::cout << "Old: " << jet->pt() << std::endl;
+  }*/
   
   /*const xAOD::JetContainer*             voronoi_jets   (nullptr);
   outputContainer = "AntiKt4Voronoi0Jets";

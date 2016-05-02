@@ -98,7 +98,7 @@ EL::StatusCode VoronoiJets :: initialize ()
     RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("ReclusterRadius",    0.4),"Problem with jetReclusteringTool initialization");
     RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("ReclusterAlgorithm", fastjet::antikt_algorithm),"Problem with jetReclusteringTool initialization");
     RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("InputJetPtMin",      0),"Problem with jetReclusteringTool initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("RCJetPtMin",         5),"Problem with jetReclusteringTool initialization");
+    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("RCJetPtMin",         7),"Problem with jetReclusteringTool initialization");
     RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("RCJetPtFrac",        0),"Problem with jetReclusteringTool initialization");
     RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->initialize(),"Problem with jetReclusteringTool initialization");
   }
@@ -122,11 +122,11 @@ EL::StatusCode VoronoiJets :: execute ()
   static SG::AuxElement::ConstAccessor< float > spreadPt("spreadPt");
   typedef xAOD::CaloClusterContainer ccc;
 
-  CaloClusterChangeSignalStateList stateHelperList;
+  /*CaloClusterChangeSignalStateList stateHelperList;
   for(auto cluster: *(in_clusters)){
     if(m_doLC) stateHelperList.add(cluster,xAOD::CaloCluster::State(1));
     else stateHelperList.add(cluster,xAOD::CaloCluster::State(0));
-  }
+  }*/
 
   for(int i=0; i<3; i++){
     std::pair< ccc*, xAOD::ShallowAuxContainer* > clustersSC = xAOD::shallowCopyContainer( *in_clusters );

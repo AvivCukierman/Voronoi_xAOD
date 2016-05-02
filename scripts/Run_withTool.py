@@ -13,6 +13,7 @@ parser.add_option("--submitDir", help="dir to store the output", default="submit
 parser.add_option("--inputDQ2", dest='use_scanDQ2', action='store_true', help="input files from DQ2", default=False )
 parser.add_option("--inputFiles", type=str, dest='search_directories', help="list of input files", default = "/atlas/local/acukierm/dijetz1and2/")
 parser.add_option("--driver", help="select where to run", choices=("direct", "prooflite", "grid", "lsf"), default="direct")
+parser.add_option("--files_per_job", help="how many files to submit per job", type=int, default=1)
 parser.add_option("--nevents", type=int, help="number of events to process for all the datasets")
 parser.add_option("--skip-events", type=int, help="skip the first n events")
 parser.add_option("-w", "--overwrite", action='store_true', default=False, help="overwrite previous submitDir")
@@ -79,6 +80,7 @@ job.sampleHandler(sh_all)
 
 if options.driver == 'lsf':
   job.options().setBool(ROOT.EL.Job.optResetShell, False);
+  job.options().setDouble(ROOT.EL.Job.optFilesPerWorker, options.files_per_job)
 
 #Set the xAOD access mode of the job:
 job.options().setString( ROOT.EL.Job.optXaodAccessMode,ROOT.EL.Job.optXaodAccessMode_branch );
@@ -95,18 +97,20 @@ if options.skip_events:
 # add our algorithm to the job
 logging.info("creating algorithms")
 myxaodanalysis = ROOT.MyxAODAnalysis()
-voronoijets = ROOT.VoronoiJets()
+#voronoiweights = ROOT.VoronoiWeights()
+#voronoijets = ROOT.VoronoiJets()
 jetmatching = ROOT.JetMatching()
 writetree = ROOT.WriteTree()
 
+setattr(myxaodanalysis, 'm_doLC', options.doLC)
 #setattr(voronoiweights, 'm_doLC', options.doLC)
-setattr(voronoijets, 'm_doLC', options.doLC)
 setattr(jetmatching, 'm_doLC', options.doLC)
 setattr(writetree, 'm_doLC', options.doLC)
 
 logging.info("adding algorithms")
 job.algsAdd(myxaodanalysis)
-job.algsAdd(voronoijets)
+#job.algsAdd(voronoiweights)
+#job.algsAdd(voronoijets)
 job.algsAdd(jetmatching)
 job.algsAdd(writetree)
 
@@ -141,5 +145,5 @@ elif (options.driver == "grid"):
 elif (options.driver == "lsf"):
   logging.info("running on LSF")
   driver = ROOT.EL.LSFDriver()
-  driver.options().setString(ROOT.EL.Job.optSubmitFlags, '-q medium')
+  driver.options().setString(ROOT.EL.Job.optSubmitFlags, '-q medium -W200')
   driver.submitOnly(job, options.submitDir)

@@ -39,7 +39,7 @@ class WriteTree : public EL::Algorithm
 public:
   bool m_debug = false;
   std::string m_eventInfo      = "EventInfo",
-              m_jets           = "AntiKt4LCTopoJets",
+              m_jets           = "AntiKt4NoAreaJets",
               m_truth_jets     = "AntiKt4TruthJets",
               m_voronoi0_jets   = "AntiKt4Voronoi0Jets",
               m_voronoi1_jets   = "AntiKt4Voronoi1Jets",
@@ -48,6 +48,15 @@ public:
   bool m_doLC = false;
 
    // methods used in the analysis
+  EL::StatusCode FillTJetVars(const DataVector<xAOD::Jet_v1>* tjets,
+                                        std::vector<float>& tjetpt,
+                                        std::vector<float>& tjeteta,
+                                        std::vector<float>& tjetphi,
+                                        std::vector<float>& tjetmass,
+                                        std::vector<float>& tjetwidth,
+                                        std::vector<float>& tjetmindr
+                                        );
+
   EL::StatusCode FillJetVars(const DataVector<xAOD::Jet_v1>* jets,
                               const DataVector<xAOD::Jet_v1>* tjets,
                                         std::vector<float>& jetpt,
@@ -56,12 +65,14 @@ public:
                                         std::vector<float>& jetmass,
                                         std::vector<float>& jetwidth,
                                         std::vector<float>& jetmindr,
+                                        std::vector<float>& cl0pt,
                                         std::vector<float>& tjetpt,
                                         std::vector<float>& tjeteta,
                                         std::vector<float>& tjetphi,
                                         std::vector<float>& tjetmass,
                                         std::vector<float>& tjetwidth,
-                                        std::vector<float>& tjetmindr);
+                                        std::vector<float>& tjetmindr,
+                                        bool doareasub=false);
 
 
   // variables that don't get filled at submission time should be
@@ -74,8 +85,17 @@ private:
 
   //everything below here is filled in the tree
   int m_eventNumber; //!
+  float m_eventWeight; //!
   int m_NPV; //!
   int m_mu; //!
+  float m_rho; //!
+
+  std::vector<float> m_tjpt; //!
+  std::vector<float> m_tjeta; //!
+  std::vector<float> m_tjphi; //!
+  std::vector<float> m_tjmass; //!
+  std::vector<float> m_tjwidth; //!
+  std::vector<float> m_tjmindr; //!
 
   std::vector<float> m_jvoro0pt; //!
   std::vector<float> m_jvoro0eta; //!
@@ -83,6 +103,7 @@ private:
   std::vector<float> m_jvoro0mass; //!
   std::vector<float> m_jvoro0width; //!
   std::vector<float> m_jvoro0mindr; //!
+  std::vector<float> m_jvoro0cl0pt; //!
   std::vector<float> m_tjvoro0pt; //!
   std::vector<float> m_tjvoro0eta; //!
   std::vector<float> m_tjvoro0phi; //!
@@ -96,6 +117,7 @@ private:
   std::vector<float> m_jvoro1mass; //!
   std::vector<float> m_jvoro1width; //!
   std::vector<float> m_jvoro1mindr; //!
+  std::vector<float> m_jvoro1cl0pt; //!
   std::vector<float> m_tjvoro1pt; //!
   std::vector<float> m_tjvoro1eta; //!
   std::vector<float> m_tjvoro1phi; //!
@@ -109,6 +131,7 @@ private:
   std::vector<float> m_jvorosmass; //!
   std::vector<float> m_jvoroswidth; //!
   std::vector<float> m_jvorosmindr; //!
+  std::vector<float> m_jvoroscl0pt; //!
   std::vector<float> m_tjvorospt; //!
   std::vector<float> m_tjvoroseta; //!
   std::vector<float> m_tjvorosphi; //!
@@ -116,12 +139,27 @@ private:
   std::vector<float> m_tjvoroswidth; //!
   std::vector<float> m_tjvorosmindr; //!
 
+  std::vector<float> m_jnoarea0pt; //!
+  std::vector<float> m_jnoarea0eta; //!
+  std::vector<float> m_jnoarea0phi; //!
+  std::vector<float> m_jnoarea0mass; //!
+  std::vector<float> m_jnoarea0width; //!
+  std::vector<float> m_jnoarea0mindr; //!
+  std::vector<float> m_jnoarea0cl0pt; //!
+  std::vector<float> m_tjnoarea0pt; //!
+  std::vector<float> m_tjnoarea0eta; //!
+  std::vector<float> m_tjnoarea0phi; //!
+  std::vector<float> m_tjnoarea0mass; //!
+  std::vector<float> m_tjnoarea0width; //!
+  std::vector<float> m_tjnoarea0mindr; //!
+
   std::vector<float> m_j0pt; //!
   std::vector<float> m_j0eta; //!
   std::vector<float> m_j0phi; //!
   std::vector<float> m_j0mass; //!
   std::vector<float> m_j0width; //!
   std::vector<float> m_j0mindr; //!
+  std::vector<float> m_j0cl0pt; //!
   std::vector<float> m_tj0pt; //!
   std::vector<float> m_tj0eta; //!
   std::vector<float> m_tj0phi; //!

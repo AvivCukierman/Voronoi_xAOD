@@ -63,8 +63,6 @@ EL::StatusCode JetMatching :: initialize ()
 {
   m_event = wk()->xaodEvent();
   m_store = wk()->xaodStore();
-  if(m_doLC) m_jets = "AntiKt4LCTopoJets";
-  else m_jets = "AntiKt4EMTopoJets";
 
   // as a check, let's see the number of events in our xAOD
   Info("initialize()", "Number of events = %lli", m_event->getEntries() ); // print long long int
@@ -81,9 +79,10 @@ EL::StatusCode JetMatching :: execute ()
   const xAOD::JetContainer*                     voronoi0_jets       (nullptr);
   const xAOD::JetContainer*                     voronoi1_jets       (nullptr);
   const xAOD::JetContainer*                     voronoispread_jets       (nullptr);
-
+  
   // start grabbing all the containers that we can
   RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
+  //m_jets = "AntiKt4EMTopoJets";
   if(!m_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug), "Could not get the jets container.");
   if(!m_truth_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug), "Could not get the truth jets container.");
   if(!m_voronoi0_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi0_jets,    m_voronoi0_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
@@ -104,20 +103,19 @@ EL::StatusCode JetMatching :: execute ()
     Error(APP_NAME,"Error in SetMinDR (only one jet in event?)");
 
   //To check truth matches:
-  m_debug = true;
   if(m_debug){
     int event_number = eventInfo->eventNumber(); //added
     if(event_number == 455939){
-    DataVector<xAOD::Jet_v1> sorted_truth_jets = HF::sort_container_pt(truth_jets);
-    static SG::AuxElement::ConstAccessor< int > truth_match_i("truth_match_i");
-    for(auto jet: *voronoispread_jets){
-      std::cout << "Reco jet: " << jet->pt() << "\t" << jet->eta() << "\t" << jet->phi() << "\t" << jet->m() << std::endl;
-      int truthmatch = truth_match_i(*jet);
-      if(truthmatch>-1){
-        auto tjet =  sorted_truth_jets.at(truthmatch);
-        std::cout << "True jet: " << tjet->pt() << "\t" << tjet->eta() << "\t" << tjet->phi() << "\t" << tjet->m() << std::endl;
+      DataVector<xAOD::Jet_v1> sorted_truth_jets = HF::sort_container_pt(truth_jets);
+      static SG::AuxElement::ConstAccessor< int > truth_match_i("truth_match_i");
+      for(auto jet: *voronoispread_jets){
+        std::cout << "Reco jet: " << jet->pt() << "\t" << jet->eta() << "\t" << jet->phi() << "\t" << jet->m() << std::endl;
+        int truthmatch = truth_match_i(*jet);
+        if(truthmatch>-1){
+          auto tjet =  sorted_truth_jets.at(truthmatch);
+          std::cout << "True jet: " << tjet->pt() << "\t" << tjet->eta() << "\t" << tjet->phi() << "\t" << tjet->m() << std::endl;
+        }
       }
-    }
     }
 
     char filename[50];
@@ -127,7 +125,6 @@ EL::StatusCode JetMatching :: execute ()
       fout << jet->pt() << "\t" << jet->eta() << "\t" << jet->phi() << "\t" << jet->m() << std::endl;
     }
   }
-  m_debug = false;
   //To check minDR:
   /*static SG::AuxElement::ConstAccessor< float > minDR("minDR");
   for(auto jet: *truth_jets){
