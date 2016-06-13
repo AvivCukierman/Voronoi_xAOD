@@ -8,7 +8,7 @@ This package makes use of [UChicago](https://github.com/UCATLAS)'s [xAODAnaHelpe
 To install,
 ```bash
 mkdir myRootCore && cd $_
-rcSetup Base,2.3.23
+rcSetup Base,2.3.41
 git clone https://github.com/kratsg/xAODJetReclustering
 git clone https://github.com/UCATLAS/xAODAnaHelpers
 git clone https://github.com/AvivCukierman/Voronoi_xAOD
