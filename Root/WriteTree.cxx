@@ -63,6 +63,7 @@ WriteTree :: WriteTree () :
   m_jvoro0mass{ARRAY_INIT},
   m_jvoro0width{ARRAY_INIT},
   m_jvoro0mindr{ARRAY_INIT},
+  m_jvoro0isPU{ARRAY_INIT},
   m_jvoro0cl0pt{ARRAY_INIT},
   m_tjvoro0pt{ARRAY_INIT},
   m_tjvoro0eta{ARRAY_INIT},
@@ -77,6 +78,7 @@ WriteTree :: WriteTree () :
   m_jvoro1mass{ARRAY_INIT},
   m_jvoro1width{ARRAY_INIT},
   m_jvoro1mindr{ARRAY_INIT},
+  m_jvoro1isPU{ARRAY_INIT},
   m_jvoro1cl0pt{ARRAY_INIT},
   m_tjvoro1pt{ARRAY_INIT},
   m_tjvoro1eta{ARRAY_INIT},
@@ -91,6 +93,7 @@ WriteTree :: WriteTree () :
   m_jvorosmass{ARRAY_INIT},
   m_jvoroswidth{ARRAY_INIT},
   m_jvorosmindr{ARRAY_INIT},
+  m_jvorosisPU{ARRAY_INIT},
   m_jvoroscl0pt{ARRAY_INIT},
   m_tjvorospt{ARRAY_INIT},
   m_tjvoroseta{ARRAY_INIT},
@@ -105,6 +108,7 @@ WriteTree :: WriteTree () :
   m_jnoarea0mass{ARRAY_INIT},
   m_jnoarea0width{ARRAY_INIT},
   m_jnoarea0mindr{ARRAY_INIT},
+  m_jnoarea0isPU{ARRAY_INIT},
   m_jnoarea0cl0pt{ARRAY_INIT},
   m_tjnoarea0pt{ARRAY_INIT},
   m_tjnoarea0eta{ARRAY_INIT},
@@ -119,6 +123,7 @@ WriteTree :: WriteTree () :
   m_j0mass{ARRAY_INIT},
   m_j0width{ARRAY_INIT},
   m_j0mindr{ARRAY_INIT},
+  m_j0isPU{ARRAY_INIT},
   m_j0cl0pt{ARRAY_INIT},
   m_tj0pt{ARRAY_INIT},
   m_tj0eta{ARRAY_INIT},
@@ -182,6 +187,7 @@ EL::StatusCode WriteTree :: initialize ()
   m_tree->Branch("jvoro0mass","std::vector<float>", &m_jvoro0mass);
   m_tree->Branch("jvoro0width","std::vector<float>", &m_jvoro0width);
   m_tree->Branch("jvoro0mindr","std::vector<float>", &m_jvoro0mindr);
+  m_tree->Branch("jvoro0isPU","std::vector<bool>", &m_jvoro0isPU);
   m_tree->Branch("jvoro0cl0pt","std::vector<float>", &m_jvoro0cl0pt);
   m_tree->Branch("tjvoro0pt","std::vector<float>", &m_tjvoro0pt);
   m_tree->Branch("tjvoro0eta","std::vector<float>", &m_tjvoro0eta);
@@ -196,6 +202,7 @@ EL::StatusCode WriteTree :: initialize ()
   m_tree->Branch("jvoro1mass","std::vector<float>", &m_jvoro1mass);
   m_tree->Branch("jvoro1width","std::vector<float>", &m_jvoro1width);
   m_tree->Branch("jvoro1mindr","std::vector<float>", &m_jvoro1mindr);
+  m_tree->Branch("jvoro1isPU","std::vector<bool>", &m_jvoro1isPU);
   m_tree->Branch("jvoro1cl0pt","std::vector<float>", &m_jvoro1cl0pt);
   m_tree->Branch("tjvoro1pt","std::vector<float>", &m_tjvoro1pt);
   m_tree->Branch("tjvoro1eta","std::vector<float>", &m_tjvoro1eta);
@@ -210,6 +217,7 @@ EL::StatusCode WriteTree :: initialize ()
   m_tree->Branch("jvorosmass","std::vector<float>", &m_jvorosmass);
   m_tree->Branch("jvoroswidth","std::vector<float>", &m_jvoroswidth);
   m_tree->Branch("jvorosmindr","std::vector<float>", &m_jvorosmindr);
+  m_tree->Branch("jvorosisPU","std::vector<bool>", &m_jvorosisPU);
   m_tree->Branch("jvoroscl0pt","std::vector<float>", &m_jvoroscl0pt);
   m_tree->Branch("tjvorospt","std::vector<float>", &m_tjvorospt);
   m_tree->Branch("tjvoroseta","std::vector<float>", &m_tjvoroseta);
@@ -224,6 +232,7 @@ EL::StatusCode WriteTree :: initialize ()
   m_tree->Branch("jnoarea0mass","std::vector<float>", &m_jnoarea0mass);
   m_tree->Branch("jnoarea0width","std::vector<float>", &m_jnoarea0width);
   m_tree->Branch("jnoarea0mindr","std::vector<float>", &m_jnoarea0mindr);
+  m_tree->Branch("jnoarea0isPU","std::vector<bool>", &m_jnoarea0isPU);
   m_tree->Branch("jnoarea0cl0pt","std::vector<float>", &m_jnoarea0cl0pt);
   m_tree->Branch("tjnoarea0pt","std::vector<float>", &m_tjnoarea0pt);
   m_tree->Branch("tjnoarea0eta","std::vector<float>", &m_tjnoarea0eta);
@@ -238,6 +247,7 @@ EL::StatusCode WriteTree :: initialize ()
   m_tree->Branch("j0mass","std::vector<float>", &m_j0mass);
   m_tree->Branch("j0width","std::vector<float>", &m_j0width);
   m_tree->Branch("j0mindr","std::vector<float>", &m_j0mindr);
+  m_tree->Branch("j0isPU","std::vector<bool>", &m_j0isPU);
   m_tree->Branch("j0cl0pt","std::vector<float>", &m_j0cl0pt);
   m_tree->Branch("tj0pt","std::vector<float>", &m_tj0pt);
   m_tree->Branch("tj0eta","std::vector<float>", &m_tj0eta);
@@ -282,16 +292,16 @@ EL::StatusCode WriteTree :: execute ()
   if(FillTJetVars(truth_jets,m_tjpt,m_tjeta,m_tjphi,m_tjmass,m_tjwidth,m_tjmindr) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FillTJetVars");
 
-  if(FillJetVars(voronoi0_jets,truth_jets,m_jvoro0pt,m_jvoro0eta,m_jvoro0phi,m_jvoro0mass,m_jvoro0width,m_jvoro0mindr,m_jvoro0cl0pt,m_tjvoro0pt,m_tjvoro0eta,m_tjvoro0phi,m_tjvoro0mass,m_tjvoro0width,m_tjvoro0mindr) != EL::StatusCode::SUCCESS)
+  if(FillJetVars(voronoi0_jets,truth_jets,m_jvoro0pt,m_jvoro0eta,m_jvoro0phi,m_jvoro0mass,m_jvoro0width,m_jvoro0mindr,m_jvoro0isPU,m_jvoro0cl0pt,m_tjvoro0pt,m_tjvoro0eta,m_tjvoro0phi,m_tjvoro0mass,m_tjvoro0width,m_tjvoro0mindr) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FillJetVars");
-  if(FillJetVars(voronoi1_jets,truth_jets,m_jvoro1pt,m_jvoro1eta,m_jvoro1phi,m_jvoro1mass,m_jvoro1width,m_jvoro1mindr,m_jvoro1cl0pt,m_tjvoro1pt,m_tjvoro1eta,m_tjvoro1phi,m_tjvoro1mass,m_tjvoro1width,m_tjvoro1mindr) != EL::StatusCode::SUCCESS)
+  if(FillJetVars(voronoi1_jets,truth_jets,m_jvoro1pt,m_jvoro1eta,m_jvoro1phi,m_jvoro1mass,m_jvoro1width,m_jvoro1mindr,m_jvoro1isPU,m_jvoro1cl0pt,m_tjvoro1pt,m_tjvoro1eta,m_tjvoro1phi,m_tjvoro1mass,m_tjvoro1width,m_tjvoro1mindr) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FillJetVars");
-  if(FillJetVars(voronois_jets,truth_jets,m_jvorospt,m_jvoroseta,m_jvorosphi,m_jvorosmass,m_jvoroswidth,m_jvorosmindr,m_jvoroscl0pt,m_tjvorospt,m_tjvoroseta,m_tjvorosphi,m_tjvorosmass,m_tjvoroswidth,m_tjvorosmindr) != EL::StatusCode::SUCCESS)
+  if(FillJetVars(voronois_jets,truth_jets,m_jvorospt,m_jvoroseta,m_jvorosphi,m_jvorosmass,m_jvoroswidth,m_jvorosmindr,m_jvorosisPU,m_jvoroscl0pt,m_tjvorospt,m_tjvoroseta,m_tjvorosphi,m_tjvorosmass,m_tjvoroswidth,m_tjvorosmindr) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FillJetVars");
 
-  if(FillJetVars(in_jets,truth_jets,m_jnoarea0pt,m_jnoarea0eta,m_jnoarea0phi,m_jnoarea0mass,m_jnoarea0width,m_jnoarea0mindr,m_jnoarea0cl0pt,m_tjnoarea0pt,m_tjnoarea0eta,m_tjnoarea0phi,m_tjnoarea0mass,m_tjnoarea0width,m_tjnoarea0mindr,false) != EL::StatusCode::SUCCESS)
+  if(FillJetVars(in_jets,truth_jets,m_jnoarea0pt,m_jnoarea0eta,m_jnoarea0phi,m_jnoarea0mass,m_jnoarea0width,m_jnoarea0mindr,m_jnoarea0isPU,m_jnoarea0cl0pt,m_tjnoarea0pt,m_tjnoarea0eta,m_tjnoarea0phi,m_tjnoarea0mass,m_tjnoarea0width,m_tjnoarea0mindr,false) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FillJetVars");
-  if(FillJetVars(in_jets,truth_jets,m_j0pt,m_j0eta,m_j0phi,m_j0mass,m_j0width,m_j0mindr,m_j0cl0pt,m_tj0pt,m_tj0eta,m_tj0phi,m_tj0mass,m_tj0width,m_tj0mindr,true) != EL::StatusCode::SUCCESS)
+  if(FillJetVars(in_jets,truth_jets,m_j0pt,m_j0eta,m_j0phi,m_j0mass,m_j0width,m_j0mindr,m_j0isPU,m_j0cl0pt,m_tj0pt,m_tj0eta,m_tj0phi,m_tj0mass,m_tj0width,m_tj0mindr,true) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FillJetVars");
 
   m_mu = eventInfo->averageInteractionsPerCrossing();
@@ -350,6 +360,7 @@ EL::StatusCode WriteTree :: FillJetVars(const DataVector<xAOD::Jet_v1>* jets,
                                         std::vector<float>& jetmass,
                                         std::vector<float>& jetwidth,
                                         std::vector<float>& jetmindr,
+                                        std::vector<bool>& jetisPU,
                                         std::vector<float>& cl0pt,
                                         std::vector<float>& tjetpt,
                                         std::vector<float>& tjeteta,
@@ -365,6 +376,7 @@ EL::StatusCode WriteTree :: FillJetVars(const DataVector<xAOD::Jet_v1>* jets,
   jetmass.clear();
   jetwidth.clear();
   jetmindr.clear();
+  jetisPU.clear();
   cl0pt.clear();
   tjetpt.clear();
   tjeteta.clear();
@@ -376,6 +388,7 @@ EL::StatusCode WriteTree :: FillJetVars(const DataVector<xAOD::Jet_v1>* jets,
   DataVector<xAOD::Jet_v1> sorted_truth_jets = HF::sort_container_pt(tjets);
   static SG::AuxElement::ConstAccessor< int > truth_match_i("truth_match_i");
   static SG::AuxElement::ConstAccessor< float > minDR("minDR");
+  static SG::AuxElement::ConstAccessor< bool > isPU("isPU");
   static SG::AuxElement::ConstAccessor< float > rho("rho");
 
   for(const auto jet: *jets){
@@ -395,7 +408,8 @@ EL::StatusCode WriteTree :: FillJetVars(const DataVector<xAOD::Jet_v1>* jets,
     jetphi.push_back(jet->phi());
     jetmass.push_back(jet->m()/1000.);
     jetwidth.push_back(-99);
-    jetmindr.push_back(-99);
+    jetmindr.push_back(minDR(*jet));
+    jetisPU.push_back(isPU(*jet));
 
     std::vector<float> jetclpt;
     for(auto constit: jet->getConstituents()){

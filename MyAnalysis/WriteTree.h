@@ -65,6 +65,7 @@ public:
                                         std::vector<float>& jetmass,
                                         std::vector<float>& jetwidth,
                                         std::vector<float>& jetmindr,
+                                        std::vector<bool>& jetisPU,
                                         std::vector<float>& cl0pt,
                                         std::vector<float>& tjetpt,
                                         std::vector<float>& tjeteta,
@@ -103,6 +104,7 @@ private:
   std::vector<float> m_jvoro0mass; //!
   std::vector<float> m_jvoro0width; //!
   std::vector<float> m_jvoro0mindr; //!
+  std::vector<bool> m_jvoro0isPU; //!
   std::vector<float> m_jvoro0cl0pt; //!
   std::vector<float> m_tjvoro0pt; //!
   std::vector<float> m_tjvoro0eta; //!
@@ -117,6 +119,7 @@ private:
   std::vector<float> m_jvoro1mass; //!
   std::vector<float> m_jvoro1width; //!
   std::vector<float> m_jvoro1mindr; //!
+  std::vector<bool> m_jvoro1isPU; //!
   std::vector<float> m_jvoro1cl0pt; //!
   std::vector<float> m_tjvoro1pt; //!
   std::vector<float> m_tjvoro1eta; //!
@@ -131,6 +134,7 @@ private:
   std::vector<float> m_jvorosmass; //!
   std::vector<float> m_jvoroswidth; //!
   std::vector<float> m_jvorosmindr; //!
+  std::vector<bool> m_jvorosisPU; //!
   std::vector<float> m_jvoroscl0pt; //!
   std::vector<float> m_tjvorospt; //!
   std::vector<float> m_tjvoroseta; //!
@@ -145,6 +149,7 @@ private:
   std::vector<float> m_jnoarea0mass; //!
   std::vector<float> m_jnoarea0width; //!
   std::vector<float> m_jnoarea0mindr; //!
+  std::vector<bool> m_jnoarea0isPU; //!
   std::vector<float> m_jnoarea0cl0pt; //!
   std::vector<float> m_tjnoarea0pt; //!
   std::vector<float> m_tjnoarea0eta; //!
@@ -159,6 +164,7 @@ private:
   std::vector<float> m_j0mass; //!
   std::vector<float> m_j0width; //!
   std::vector<float> m_j0mindr; //!
+  std::vector<bool> m_j0isPU; //!
   std::vector<float> m_j0cl0pt; //!
   std::vector<float> m_tj0pt; //!
   std::vector<float> m_tj0eta; //!

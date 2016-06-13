@@ -95,11 +95,18 @@ EL::StatusCode JetMatching :: execute ()
     Error(APP_NAME,"Error in FindTruthMatch");
   if(FindTruthMatch(HF::sort_container_pt(voronoispread_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FindTruthMatch");
-
   if(FindTruthMatch(HF::sort_container_pt(in_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FindTruthMatch");
 
   if(SetMinDR(HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in SetMinDR (only one jet in event?)");
+  if(SetMinDR(HF::sort_container_pt(in_jets),2000) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in SetMinDR (only one jet in event?)");
+  if(SetMinDR(HF::sort_container_pt(voronoi0_jets),2000) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in SetMinDR (only one jet in event?)");
+  if(SetMinDR(HF::sort_container_pt(voronoi1_jets),2000) != EL::StatusCode::SUCCESS)
+    Error(APP_NAME,"Error in SetMinDR (only one jet in event?)");
+  if(SetMinDR(HF::sort_container_pt(voronoispread_jets),2000) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in SetMinDR (only one jet in event?)");
 
   //To check truth matches:
@@ -145,29 +152,33 @@ EL::StatusCode JetMatching :: histFinalize () {
 }
 
 float deltaR(DataVector<xAOD::Jet_v1>::ElementProxy jet1, DataVector<xAOD::Jet_v1>::ElementProxy jet2){
-  float deltaphi = fmod(fabs(jet1->phi() - jet2->phi()),2*3.14159265);
+  fastjet::PseudoJet pjet1 = fastjet::PseudoJet(jet1->p4());
+  fastjet::PseudoJet pjet2 = fastjet::PseudoJet(jet2->p4());
+  float deltaphi = pjet1.delta_phi_to(pjet2);
   float deltaeta = jet1->eta() - jet2->eta();
-  return sqrt(pow(deltaphi,2) + pow(deltaeta,2));
+  float dR =  sqrt(pow(deltaphi,2) + pow(deltaeta,2));
+  return dR;
 }
 
 EL::StatusCode JetMatching :: FindTruthMatch(DataVector<xAOD::Jet_v1> jets, DataVector<xAOD::Jet_v1> tjets){
   std::vector<int> matched;
   float MAXJETTRUTHMATCHDR = 0.3;
+  float MINPUJETTRUTHMATCHDR = 0.6;
   static SG::AuxElement::Decorator< int > truth_match_i("truth_match_i");
+  static SG::AuxElement::Decorator< bool > isPU("isPU");
   for(int iJ=0; iJ<jets.size(); iJ++) {
     DataVector<xAOD::Jet_v1>::ElementProxy jet = jets.at(iJ);
-    //float mindR= 999.99;
+    float mindR= 999.99;
     float maxPt=-999.99;
     //int minDRindex =-1;
     int maxPtIndex =-1;
     for(int iTrueJ=0; iTrueJ<tjets.size(); iTrueJ++){
-      if(std::find(matched.begin(), matched.end(), iTrueJ) != matched.end())
-        continue; //if true jet has already been matched, skip it -> bijective matching
       DataVector<xAOD::Jet_v1>::ElementProxy tjet = tjets.at(iTrueJ);
 
       float dR = deltaR(jet,tjet);
-
-      //if(dR<mindR){ mindR = dR; minDRindex = iTrueJ;}
+      if(dR<mindR){ mindR = dR;}
+      if(std::find(matched.begin(), matched.end(), iTrueJ) != matched.end())
+        continue; //if true jet has already been matched, skip it -> truth jet is matched to at most one reco jet 
       if(dR < MAXJETTRUTHMATCHDR && maxPt < tjet->pt())
         { maxPt = tjet->pt(); maxPtIndex = iTrueJ;} //match to highest pT truth jet within MAXDR, not closest
     }//true jets
@@ -178,11 +189,12 @@ EL::StatusCode JetMatching :: FindTruthMatch(DataVector<xAOD::Jet_v1> jets, Data
         jet(maxPtIndex, TruthJetType).Add(JetType+"_match", thejet, true);*/ //add link from truth jet to jet as well eventually
     }
     truth_match_i(*jet) = maxPtIndex; //if no match truth_match_i == -1
+    isPU(*jet) = mindR>MINPUJETTRUTHMATCHDR; //mindR to any truth jet
   }//jet loop
   return EL::StatusCode::SUCCESS;
 }
 
-EL::StatusCode JetMatching :: SetMinDR(DataVector<xAOD::Jet_v1> jets){
+EL::StatusCode JetMatching :: SetMinDR(DataVector<xAOD::Jet_v1> jets,float threshold){
   static SG::AuxElement::Decorator< float > minDR("minDR");
   for(int iJ=0; iJ<jets.size(); iJ++) {
     DataVector<xAOD::Jet_v1>::ElementProxy jet1 = jets.at(iJ);
@@ -190,19 +202,19 @@ EL::StatusCode JetMatching :: SetMinDR(DataVector<xAOD::Jet_v1> jets){
     for(int jJ=0; jJ<jets.size(); jJ++){
       if(iJ==jJ) continue;
       DataVector<xAOD::Jet_v1>::ElementProxy jet2 = jets.at(jJ);
-      if(jet2->pt() < 5000) continue;
+      if(jet2->pt() < threshold) continue;
 
       float dR = deltaR(jet1,jet2);
 
       if(dR<mindR){ mindR = dR;}
     } //inner jet loop
 
-    if(mindR < 999.99){
-      minDR(*jet1) = mindR; 
-    }
-    else{
-      return EL::StatusCode::FAILURE;
-    }
+    //if(mindR < 999.99){
+    minDR(*jet1) = mindR; 
+    //}
+    //else{
+    //  return EL::StatusCode::FAILURE;
+    //}
   }//jet loop
   return EL::StatusCode::SUCCESS;
 }
