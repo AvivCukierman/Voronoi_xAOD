@@ -8,9 +8,11 @@ This package makes use of [UChicago](https://github.com/UCATLAS)'s [xAODAnaHelpe
 To install,
 ```bash
 mkdir myRootCore && cd $_
-rcSetup Base,2.3.41
+setupATLAS
+rcSetup Base,2.3.45
 git clone https://github.com/kratsg/xAODJetReclustering
 git clone https://github.com/UCATLAS/xAODAnaHelpers
+cd xAODAnaHelpers && git checkout 2.3.X && cd -
 git clone https://github.com/AvivCukierman/VoronoiWeightTool
 git clone https://github.com/AvivCukierman/Voronoi_xAOD
 mv Voronoi_xAOD MyAnalysis
