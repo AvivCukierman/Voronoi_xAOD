@@ -9,10 +9,8 @@ To install,
 ```bash
 mkdir myRootCore && cd $_
 setupATLAS
-rcSetup Base,2.3.45
-git clone https://github.com/kratsg/xAODJetReclustering
+rcSetup Base,2.4.33
 git clone https://github.com/UCATLAS/xAODAnaHelpers
-cd xAODAnaHelpers && git checkout 2.3.X && cd -
 git clone https://github.com/AvivCukierman/VoronoiWeightTool
 git clone https://github.com/AvivCukierman/Voronoi_xAOD
 mv Voronoi_xAOD MyAnalysis
