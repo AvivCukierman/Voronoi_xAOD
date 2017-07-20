@@ -151,9 +151,9 @@ EL::StatusCode MyxAODAnalysis :: execute ()
   // start grabbing all the containers that we can
   std::string m_clust = "CaloCalTopoClusters";
   if(!m_clust.empty())
-    ANA_CHECK(HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug));
+    ANA_CHECK(HF::retrieve(in_clusters,     m_clust,       m_event, m_store, msg()));
   std::string m_eventInfo      = "EventInfo";
-  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug));
+  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, msg()));
    //int event_number = eventInfo->eventNumber(); //added
    //std::cout << event_number << std::endl;
 
@@ -170,13 +170,13 @@ EL::StatusCode MyxAODAnalysis :: execute ()
   std::string cluster_containers[3] = {"voro0clusters","voro1clusters","vorosclusters"};
   const xAOD::CaloClusterContainer*             voronoi_clusters   (nullptr);
   if(!cluster_containers[0].empty())
-    ANA_CHECK(HF::retrieve(voronoi_clusters,     cluster_containers[0],       m_event, m_store, m_debug));
+    ANA_CHECK(HF::retrieve(voronoi_clusters,     cluster_containers[0],       m_event, m_store, msg()));
   const xAOD::CaloClusterContainer*             voronoi1_clusters   (nullptr);
   if(!cluster_containers[1].empty())
-    ANA_CHECK(HF::retrieve(voronoi1_clusters,     cluster_containers[1],       m_event, m_store, m_debug));
+    ANA_CHECK(HF::retrieve(voronoi1_clusters,     cluster_containers[1],       m_event, m_store, msg()));
   const xAOD::CaloClusterContainer*             voronoispread_clusters   (nullptr);
   if(!cluster_containers[2].empty())
-    ANA_CHECK(HF::retrieve(voronoispread_clusters,     cluster_containers[2],       m_event, m_store, m_debug));
+    ANA_CHECK(HF::retrieve(voronoispread_clusters,     cluster_containers[2],       m_event, m_store, msg()));
   for(const auto clust: *in_clusters){
     if(m_doLC) stateHelperList.add(clust,xAOD::CaloCluster::State(1)); //default is calibrated but we can make it explicit anyway
     else stateHelperList.add(clust,xAOD::CaloCluster::State(0));
@@ -208,13 +208,13 @@ EL::StatusCode MyxAODAnalysis :: execute ()
   m_store->record(event_rho,std::string("rho")); // This works but I have no idea how to retrieve it.
   float* new_rho;
   std::cout << *new_rho << std::endl;
-  HF::retrieve(new_rho, std::string("rho"), m_event, m_store, m_debug);
+  HF::retrieve(new_rho, std::string("rho"), m_event, m_store, msg());
   std::cout << "new_rho: " << *new_rho << std::endl;*/
 
   const xAOD::JetContainer*             test_jets   (nullptr);
   std::string outputContainer = "AntiKt4NoAreaJets";
 //  std::cout << outputContainer << std::endl;
-    ANA_CHECK(HF::retrieve(test_jets,     outputContainer,       m_event, m_store, m_debug));
+    ANA_CHECK(HF::retrieve(test_jets,     outputContainer,       m_event, m_store, msg()));
   SetRho(HF::sort_container_pt(test_jets),event_rho);
 
   /*static SG::AuxElement::ConstAccessor< float > rho("rho");
@@ -226,14 +226,14 @@ EL::StatusCode MyxAODAnalysis :: execute ()
 
   const xAOD::JetContainer * oldjets (nullptr);
   std::string m_oldjets = "AntiKt4EMTopoJets";
-  ANA_CHECK(HF::retrieve(oldjets,     m_oldjets,       m_event, m_store, m_debug));
+  ANA_CHECK(HF::retrieve(oldjets,     m_oldjets,       m_event, m_store, msg()));
   for(auto jet: *oldjets){
     std::cout << "Old: " << jet->pt() << std::endl;
   }*/
   
   /*const xAOD::JetContainer*             voronoi_jets   (nullptr);
   outputContainer = "AntiKt4Voronoi0Jets";
-    ANA_CHECK(HF::retrieve(voronoi_jets,     outputContainer,       m_event, m_store, m_debug));
+    ANA_CHECK(HF::retrieve(voronoi_jets,     outputContainer,       m_event, m_store, msg()));
   for(auto jet: *voronoi_jets){
     std::cout << "V0 Jet: " << jet->pt() << "\t" << jet->eta() << "\t" << jet->phi() << "\t" << jet->m() << std::endl;
     for(auto constit: jet->getConstituents()){
@@ -242,7 +242,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
   }*/
   /*const xAOD::JetContainer*             voronoispread_jets   (nullptr);
   outputContainer = "AntiKt4VoronoiSpreadJets";
-  ANA_CHECK(HF::retrieve(voronoispread_jets,     outputContainer,       m_event, m_store, m_debug));
+  ANA_CHECK(HF::retrieve(voronoispread_jets,     outputContainer,       m_event, m_store, msg()));
   for(auto jet: *voronoispread_jets){
     std::cout << "VS Jet: " << jet->pt() << "\t" << jet->eta() << "\t" << jet->phi() << "\t" << jet->m() << std::endl;
   }*/

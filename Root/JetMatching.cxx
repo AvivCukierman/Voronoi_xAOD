@@ -81,13 +81,13 @@ EL::StatusCode JetMatching :: execute ()
   const xAOD::JetContainer*                     voronoispread_jets       (nullptr);
   
   // start grabbing all the containers that we can
-  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug));
+  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, msg()));
   //m_jets = "AntiKt4EMTopoJets";
-  if(!m_jets.empty()) ANA_CHECK(HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug));
-  if(!m_truth_jets.empty()) ANA_CHECK(HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug));
-  if(!m_voronoi0_jets.empty()) ANA_CHECK(HF::retrieve(voronoi0_jets,    m_voronoi0_jets,       m_event, m_store, m_debug));
-  if(!m_voronoi1_jets.empty()) ANA_CHECK(HF::retrieve(voronoi1_jets,    m_voronoi1_jets,       m_event, m_store, m_debug));
-  if(!m_voronoispread_jets.empty()) ANA_CHECK(HF::retrieve(voronoispread_jets,    m_voronoispread_jets,       m_event, m_store, m_debug));
+  if(!m_jets.empty()) ANA_CHECK(HF::retrieve(in_jets,     m_jets,       m_event, m_store, msg()));
+  if(!m_truth_jets.empty()) ANA_CHECK(HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, msg()));
+  if(!m_voronoi0_jets.empty()) ANA_CHECK(HF::retrieve(voronoi0_jets,    m_voronoi0_jets,       m_event, m_store, msg()));
+  if(!m_voronoi1_jets.empty()) ANA_CHECK(HF::retrieve(voronoi1_jets,    m_voronoi1_jets,       m_event, m_store, msg()));
+  if(!m_voronoispread_jets.empty()) ANA_CHECK(HF::retrieve(voronoispread_jets,    m_voronoispread_jets,       m_event, m_store, msg()));
 
   if(FindTruthMatch(HF::sort_container_pt(voronoi0_jets), HF::sort_container_pt(truth_jets)) != EL::StatusCode::SUCCESS)
     Error(APP_NAME,"Error in FindTruthMatch");

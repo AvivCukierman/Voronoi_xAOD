@@ -96,9 +96,9 @@ EL::StatusCode VoronoiWeights :: execute ()
   const xAOD::CaloClusterContainer*             in_clusters   (nullptr);
   
   // start grabbing all the containers that we can
-  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug));
+  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, msg()));
   if(!m_clust.empty())
-    ANA_CHECK(HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug));
+    ANA_CHECK(HF::retrieve(in_clusters,     m_clust,       m_event, m_store, msg()));
 
   clusters.clear();
 

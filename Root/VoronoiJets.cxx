@@ -113,8 +113,8 @@ EL::StatusCode VoronoiJets :: execute ()
   const xAOD::CaloClusterContainer*             in_clusters   (nullptr);
 
   // start grabbing all the containers that we can
-  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug));
-  if(!m_clust.empty()) ANA_CHECK(HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug));
+  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, msg()));
+  if(!m_clust.empty()) ANA_CHECK(HF::retrieve(in_clusters,     m_clust,       m_event, m_store, msg()));
   //int event_number = eventInfo->eventNumber(); //added
 
   static SG::AuxElement::ConstAccessor< float > voro0Pt("voro0Pt");
@@ -173,7 +173,7 @@ EL::StatusCode VoronoiJets :: execute ()
   
   if(m_debug){
     const xAOD::JetContainer*                     out_jets       (nullptr);
-    ANA_CHECK(HF::retrieve(out_jets,     "AntiKt4VoronoiSpreadJets",       m_event, m_store, m_debug));
+    ANA_CHECK(HF::retrieve(out_jets,     "AntiKt4VoronoiSpreadJets",       m_event, m_store, msg()));
     for(auto jet: *out_jets){
       std::cout << "Jet: " << jet->pt() << ";" << jet->eta() << ";" << jet->phi() << ";" << jet->m() << std::endl;
       for(auto constit: jet->getConstituents()){

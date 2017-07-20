@@ -271,14 +271,14 @@ EL::StatusCode WriteTree :: execute ()
   const xAOD::VertexContainer*                  vertices      (nullptr);
 
   // start grabbing all the containers that we can
-  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug));
+  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, msg()));
   //m_jets = "AntiKt4EMTopoJets";
-  if(!m_jets.empty()) ANA_CHECK(HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug));
-  if(!m_truth_jets.empty()) ANA_CHECK(HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug));
-  if(!m_voronoi0_jets.empty()) ANA_CHECK(HF::retrieve(voronoi0_jets,    m_voronoi0_jets,       m_event, m_store, m_debug));
-  if(!m_voronoi1_jets.empty()) ANA_CHECK(HF::retrieve(voronoi1_jets,    m_voronoi1_jets,       m_event, m_store, m_debug));
-  if(!m_voronois_jets.empty()) ANA_CHECK(HF::retrieve(voronois_jets,    m_voronois_jets,       m_event, m_store, m_debug));
-  if(!m_vertices.empty()) ANA_CHECK(HF::retrieve(vertices,    m_vertices,       m_event, m_store, m_debug));
+  if(!m_jets.empty()) ANA_CHECK(HF::retrieve(in_jets,     m_jets,       m_event, m_store, msg()));
+  if(!m_truth_jets.empty()) ANA_CHECK(HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, msg()));
+  if(!m_voronoi0_jets.empty()) ANA_CHECK(HF::retrieve(voronoi0_jets,    m_voronoi0_jets,       m_event, m_store, msg()));
+  if(!m_voronoi1_jets.empty()) ANA_CHECK(HF::retrieve(voronoi1_jets,    m_voronoi1_jets,       m_event, m_store, msg()));
+  if(!m_voronois_jets.empty()) ANA_CHECK(HF::retrieve(voronois_jets,    m_voronois_jets,       m_event, m_store, msg()));
+  if(!m_vertices.empty()) ANA_CHECK(HF::retrieve(vertices,    m_vertices,       m_event, m_store, msg()));
 
   if(m_debug){
     std::cout << "Voronoi0 Jets" << std::endl;
