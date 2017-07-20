@@ -35,7 +35,7 @@
 #include <VoronoiWeightTool/VoronoiWeightTool.h>
 
 //Reclustering
-#include <xAODJetReclustering/JetReclusteringTool.h>
+#include <JetReclustering/JetReclusteringTool.h>
 
 //#include "MyAnalysis/Candidate.h"
 //#include "MyAnalysis/constituentTests.h"

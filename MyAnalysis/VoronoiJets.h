@@ -33,7 +33,7 @@
 #include <TTree.h>
 
 //Reclustering
-#include <xAODJetReclustering/JetReclusteringTool.h>
+#include <JetReclustering/JetReclusteringTool.h>
 
 class VoronoiJets : public EL::Algorithm
 {

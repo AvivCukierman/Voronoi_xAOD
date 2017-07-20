@@ -35,10 +35,10 @@
 
 // xAH includes
 #include "xAODAnaHelpers/HelperFunctions.h"
-#include "xAODAnaHelpers/tools/ReturnCheck.h"
+//#include "xAODAnaHelpers/tools/ReturnCheck.h"
 
 //Reclustering
-#include <xAODJetReclustering/JetReclusteringTool.h>
+#include <JetReclustering/JetReclusteringTool.h>
 
 namespace HF = HelperFunctions;
 
@@ -93,14 +93,14 @@ EL::StatusCode VoronoiJets :: initialize ()
         break;
     }
     m_jetReclusteringTools[i] = new JetReclusteringTool(outputContainer+std::to_string(std::rand()));
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("InputJetContainer",  inputContainer),"Problem with jetReclusteringTool initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("OutputJetContainer", outputContainer),"Problem with jetReclusteringTool initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("ReclusterRadius",    0.4),"Problem with jetReclusteringTool initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("ReclusterAlgorithm", fastjet::antikt_algorithm),"Problem with jetReclusteringTool initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("InputJetPtMin",      0),"Problem with jetReclusteringTool initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("RCJetPtMin",         7),"Problem with jetReclusteringTool initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("RCJetPtFrac",        0),"Problem with jetReclusteringTool initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->initialize(),"Problem with jetReclusteringTool initialization");
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("InputJetContainer",  inputContainer));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("OutputJetContainer", outputContainer));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("ReclusterRadius",    0.4));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("ReclusterAlgorithm", fastjet::antikt_algorithm));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("InputJetPtMin",      0));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("RCJetPtMin",         7));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("RCJetPtFrac",        0));
+    ANA_CHECK(m_jetReclusteringTools[i]->initialize());
   }
 
   return EL::StatusCode::SUCCESS;
@@ -113,8 +113,8 @@ EL::StatusCode VoronoiJets :: execute ()
   const xAOD::CaloClusterContainer*             in_clusters   (nullptr);
 
   // start grabbing all the containers that we can
-  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
-  if(!m_clust.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug), "Could not get the clusters container.");
+  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug));
+  if(!m_clust.empty()) ANA_CHECK(HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug));
   //int event_number = eventInfo->eventNumber(); //added
 
   static SG::AuxElement::ConstAccessor< float > voro0Pt("voro0Pt");
@@ -173,7 +173,7 @@ EL::StatusCode VoronoiJets :: execute ()
   
   if(m_debug){
     const xAOD::JetContainer*                     out_jets       (nullptr);
-    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(out_jets,     "AntiKt4VoronoiSpreadJets",       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
+    ANA_CHECK(HF::retrieve(out_jets,     "AntiKt4VoronoiSpreadJets",       m_event, m_store, m_debug));
     for(auto jet: *out_jets){
       std::cout << "Jet: " << jet->pt() << ";" << jet->eta() << ";" << jet->phi() << ";" << jet->m() << std::endl;
       for(auto constit: jet->getConstituents()){

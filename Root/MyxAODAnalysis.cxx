@@ -12,7 +12,7 @@
 
 #include <MyAnalysis/MyxAODAnalysis.h>
 #include <VoronoiWeightTool/VoronoiWeightTool.h>
-#include <xAODJetReclustering/JetReclusteringTool.h>
+#include <JetReclustering/JetReclusteringTool.h>
 
 #include <xAODJet/FastJetLinkBase.h>
 #include "JetInterface/IPseudoJetGetter.h"
@@ -46,7 +46,7 @@
 
 // xAH includes
 #include "xAODAnaHelpers/HelperFunctions.h"
-#include "xAODAnaHelpers/tools/ReturnCheck.h"
+//#include "xAODAnaHelpers/tools/ReturnCheck.h"
 
 // this is needed to distribute the algorithm to the workers
 ClassImp(MyxAODAnalysis)
@@ -125,15 +125,16 @@ EL::StatusCode MyxAODAnalysis :: initialize ()
         break;
     }
     m_jetReclusteringTools[i] = new JetReclusteringTool(outputContainer+std::to_string(std::rand()));
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("InputJetContainer",  cluster_containers[i]),"Problem with jetReclusteringTools[i] initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("OutputJetContainer", outputContainer),"Problem with jetReclusteringTools[i] initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("ReclusterRadius",    0.4),"Problem with jetReclusteringTools[i] initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("ReclusterAlgorithm", fastjet::antikt_algorithm),"Problem with jetReclusteringTools[i] initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("InputJetPtMin",      0),"Problem with jetReclusteringTools[i] initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("RCJetPtMin",         0.1),"Problem with jetReclusteringTools[i] initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("RCJetPtFrac",        0),"Problem with jetReclusteringTools[i] initialization");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->setProperty("DoArea",        true),"Problem with jetReclusteringTools[i] initialiation");
-    RETURN_CHECK("VoronoiWeights::execute()",m_jetReclusteringTools[i]->initialize(),"Problem with jetReclusteringTools[i] initialization");
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("InputJetContainer",  cluster_containers[i]));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("OutputJetContainer", outputContainer));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("ReclusterRadius",    0.4));
+    //ANA_CHECK(m_jetReclusteringTools[i]->setProperty("ReclusterAlgorithm", fastjet::antikt_algorithm));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("ReclusterAlgorithm", "AntiKt"));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("InputJetPtMin",      0));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("RCJetPtMin",         0.1));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("RCJetPtFrac",        0));
+    ANA_CHECK(m_jetReclusteringTools[i]->setProperty("DoArea",        true));
+    ANA_CHECK(m_jetReclusteringTools[i]->initialize());
   }
 
 
@@ -150,9 +151,9 @@ EL::StatusCode MyxAODAnalysis :: execute ()
   // start grabbing all the containers that we can
   std::string m_clust = "CaloCalTopoClusters";
   if(!m_clust.empty())
-    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug), "Could not get the clusters container.");
+    ANA_CHECK(HF::retrieve(in_clusters,     m_clust,       m_event, m_store, m_debug));
   std::string m_eventInfo      = "EventInfo";
-  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
+  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug));
    //int event_number = eventInfo->eventNumber(); //added
    //std::cout << event_number << std::endl;
 
@@ -169,13 +170,13 @@ EL::StatusCode MyxAODAnalysis :: execute ()
   std::string cluster_containers[3] = {"voro0clusters","voro1clusters","vorosclusters"};
   const xAOD::CaloClusterContainer*             voronoi_clusters   (nullptr);
   if(!cluster_containers[0].empty())
-    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi_clusters,     cluster_containers[0],       m_event, m_store, m_debug), "Could not get the clusters container.");
+    ANA_CHECK(HF::retrieve(voronoi_clusters,     cluster_containers[0],       m_event, m_store, m_debug));
   const xAOD::CaloClusterContainer*             voronoi1_clusters   (nullptr);
   if(!cluster_containers[1].empty())
-    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi1_clusters,     cluster_containers[1],       m_event, m_store, m_debug), "Could not get the clusters container.");
+    ANA_CHECK(HF::retrieve(voronoi1_clusters,     cluster_containers[1],       m_event, m_store, m_debug));
   const xAOD::CaloClusterContainer*             voronoispread_clusters   (nullptr);
   if(!cluster_containers[2].empty())
-    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoispread_clusters,     cluster_containers[2],       m_event, m_store, m_debug), "Could not get the clusters container.");
+    ANA_CHECK(HF::retrieve(voronoispread_clusters,     cluster_containers[2],       m_event, m_store, m_debug));
   for(const auto clust: *in_clusters){
     if(m_doLC) stateHelperList.add(clust,xAOD::CaloCluster::State(1)); //default is calibrated but we can make it explicit anyway
     else stateHelperList.add(clust,xAOD::CaloCluster::State(0));
@@ -213,7 +214,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
   const xAOD::JetContainer*             test_jets   (nullptr);
   std::string outputContainer = "AntiKt4NoAreaJets";
 //  std::cout << outputContainer << std::endl;
-    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(test_jets,     outputContainer,       m_event, m_store, m_debug), "Could not get the jets container.");
+    ANA_CHECK(HF::retrieve(test_jets,     outputContainer,       m_event, m_store, m_debug));
   SetRho(HF::sort_container_pt(test_jets),event_rho);
 
   /*static SG::AuxElement::ConstAccessor< float > rho("rho");
@@ -225,14 +226,14 @@ EL::StatusCode MyxAODAnalysis :: execute ()
 
   const xAOD::JetContainer * oldjets (nullptr);
   std::string m_oldjets = "AntiKt4EMTopoJets";
-  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(oldjets,     m_oldjets,       m_event, m_store, m_debug), "Could not get the jets container.");
+  ANA_CHECK(HF::retrieve(oldjets,     m_oldjets,       m_event, m_store, m_debug));
   for(auto jet: *oldjets){
     std::cout << "Old: " << jet->pt() << std::endl;
   }*/
   
   /*const xAOD::JetContainer*             voronoi_jets   (nullptr);
   outputContainer = "AntiKt4Voronoi0Jets";
-    RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi_jets,     outputContainer,       m_event, m_store, m_debug), "Could not get the jets container.");
+    ANA_CHECK(HF::retrieve(voronoi_jets,     outputContainer,       m_event, m_store, m_debug));
   for(auto jet: *voronoi_jets){
     std::cout << "V0 Jet: " << jet->pt() << "\t" << jet->eta() << "\t" << jet->phi() << "\t" << jet->m() << std::endl;
     for(auto constit: jet->getConstituents()){
@@ -241,7 +242,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
   }*/
   /*const xAOD::JetContainer*             voronoispread_jets   (nullptr);
   outputContainer = "AntiKt4VoronoiSpreadJets";
-  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoispread_jets,     outputContainer,       m_event, m_store, m_debug), "Could not get the jets container.");
+  ANA_CHECK(HF::retrieve(voronoispread_jets,     outputContainer,       m_event, m_store, m_debug));
   for(auto jet: *voronoispread_jets){
     std::cout << "VS Jet: " << jet->pt() << "\t" << jet->eta() << "\t" << jet->phi() << "\t" << jet->m() << std::endl;
   }*/

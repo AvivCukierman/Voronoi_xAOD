@@ -23,7 +23,7 @@
 
 // xAH includes
 #include "xAODAnaHelpers/HelperFunctions.h"
-#include "xAODAnaHelpers/tools/ReturnCheck.h"
+//#include "xAODAnaHelpers/tools/ReturnCheck.h"
 
 // root includes
 #include <TFile.h>
@@ -76,7 +76,7 @@ EL::StatusCode WriteTree :: execute ()
   const xAOD::EventInfo*                eventInfo     (nullptr);
 
   // start grabbing all the containers that we can
-  RETURN_CHECK("WriteTree::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
+  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug));
 
   // compute variables for optimization
   m_eventNumber = eventInfo->eventNumber();

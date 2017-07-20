@@ -34,7 +34,7 @@
 
 // xAH includes
 #include "xAODAnaHelpers/HelperFunctions.h"
-#include "xAODAnaHelpers/tools/ReturnCheck.h"
+//#include "xAODAnaHelpers/tools/ReturnCheck.h"
 
 namespace HF = HelperFunctions;
 
@@ -271,14 +271,14 @@ EL::StatusCode WriteTree :: execute ()
   const xAOD::VertexContainer*                  vertices      (nullptr);
 
   // start grabbing all the containers that we can
-  RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug), "Could not get the EventInfo container.");
+  ANA_CHECK(HF::retrieve(eventInfo,    m_eventInfo,        m_event, m_store, m_debug));
   //m_jets = "AntiKt4EMTopoJets";
-  if(!m_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug), "Could not get the jets container.");
-  if(!m_truth_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug), "Could not get the truth jets container.");
-  if(!m_voronoi0_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi0_jets,    m_voronoi0_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
-  if(!m_voronoi1_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronoi1_jets,    m_voronoi1_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
-  if(!m_voronois_jets.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(voronois_jets,    m_voronois_jets,       m_event, m_store, m_debug), "Could not get the voronoi jets container.");
-  if(!m_vertices.empty()) RETURN_CHECK("VoronoiWeights::execute()", HF::retrieve(vertices,    m_vertices,       m_event, m_store, m_debug), "Could not get the vertices container.");
+  if(!m_jets.empty()) ANA_CHECK(HF::retrieve(in_jets,     m_jets,       m_event, m_store, m_debug));
+  if(!m_truth_jets.empty()) ANA_CHECK(HF::retrieve(truth_jets,    m_truth_jets,       m_event, m_store, m_debug));
+  if(!m_voronoi0_jets.empty()) ANA_CHECK(HF::retrieve(voronoi0_jets,    m_voronoi0_jets,       m_event, m_store, m_debug));
+  if(!m_voronoi1_jets.empty()) ANA_CHECK(HF::retrieve(voronoi1_jets,    m_voronoi1_jets,       m_event, m_store, m_debug));
+  if(!m_voronois_jets.empty()) ANA_CHECK(HF::retrieve(voronois_jets,    m_voronois_jets,       m_event, m_store, m_debug));
+  if(!m_vertices.empty()) ANA_CHECK(HF::retrieve(vertices,    m_vertices,       m_event, m_store, m_debug));
 
   if(m_debug){
     std::cout << "Voronoi0 Jets" << std::endl;
